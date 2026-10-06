@@ -1,4 +1,4 @@
-﻿const cloud = require('wx-server-sdk');
+const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
@@ -778,9 +778,10 @@ if (!__ensureNutriWired) {
   console.error('[selfcheck] FAIL：ensureNutri 函数未定义，营养补全已失效，请检查代码。');
 }
 
-// 菜谱参考库（精简索引，本地维护，由 getCookGuide/cookbook.json 生成）：菜名 → 参考食材数组。
-// 用途：生成推荐后，用公开菜谱的「参考食材」做锚点，校准/确认每道菜是否搭配合理、组合协调。
-// 注意：云函数禁止 require 兄弟目录，故本文件与 cookbook.json 同源、单独落在本函数目录内（cookbook_ref.json）。
+// 菜谱参考库（精简索引，本地维护，由云端菜品库 dish_ingredients 导出）：菜名 → 参考食材数组。
+// 用途：生成推荐后，用菜谱的「参考食材」做锚点，校准/确认每道菜是否搭配合理、组合协调。
+// 注意：云函数禁止 require 兄弟目录，故本文件单独落在本函数目录内（cookbook_ref.json），
+//       并与 manageShopping / env2 各函数目录内的副本保持同源。
 
 const COOK_REF = require('./cookbook_ref.json');
 
