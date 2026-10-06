@@ -12,14 +12,22 @@ const model = ai.createModel('cloudbase');
 
 const DEFAULT_PROMPT = '请用一句话给一个正在纠结「今天吃啥」的朋友，推荐一道家常菜，并附一句随口的推荐理由（不超过20字）。';
 
+// 单个查询参数解码：畸形转义（例如 ?a=%）会让 decodeURIComponent 抛 URIError。
+// 逐项兜住 —— 坏的那一项退化为原串，其余参数照常解析。
+// 比在调用处整体 try/catch 更好：后者会因为一个坏参数丢掉整个 query。
+function safeDecode(s) {
+  try { return decodeURIComponent(s); } catch (e) { return String(s); }
+}
+
 function parseQuery(url) {
   const raw = (url || '').split('?')[1] || '';
-  const params = {};
+  // 无原型对象：查询串的键完全来自外部，不给 Object.prototype 任何可乘之机
+  const params = Object.create(null);
   raw.split('&').forEach(p => {
     if (!p) return;
     const i = p.indexOf('=');
-    if (i < 0) params[decodeURIComponent(p)] = '';
-    else params[decodeURIComponent(p.slice(0, i))] = decodeURIComponent(p.slice(i + 1));
+    if (i < 0) params[safeDecode(p)] = '';
+    else params[safeDecode(p.slice(0, i))] = safeDecode(p.slice(i + 1));
   });
   return params;
 }
