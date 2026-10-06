@@ -7,12 +7,8 @@ const { decorateGuide } = require('../../utils/ingredient_group');
 const { chooseType: repChooseType, submitReport: repSubmit } = require('../../utils/dishReport');
 clientLog.hook();
 
-// 去外卖平台（换 AppID 只改这里一处，需与 app.json 白名单一致）
-const TAKEOUT_PLATFORMS = [
-  { appId: 'wx2c348cf579062e56', name: '美团外卖', cls: 'meituan' },
-  { appId: 'wxece3a9a4c82f58c9', name: '淘宝闪购', cls: 'taobao' },
-  { appId: 'wxad169f0e9e78fe47', name: '京东外卖', cls: 'jd' }
-];
+// 去外卖平台（AppID 统一维护在 utils/config.js 的 TAKEOUT_PLATFORMS）
+const { TAKEOUT_PLATFORMS } = require('../../utils/config');
 
 // 兼容旧版（扁平/含 items）与新版（含 dishes/staples/drinks）
 function normalizeGroups(recs) {

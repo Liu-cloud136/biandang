@@ -176,5 +176,16 @@ module.exports = {
 
   // 社区贡献食材分类（贡献时让用户选；合并入库、设置偏好第 8 步按此分组弹窗）
   // 与云端 submitContribution 的白名单保持一致（云端为防越权另存一份副本）。
-  ING_CATEGORIES: ['蔬菜菌菇', '肉禽蛋', '水产海鲜', '主食杂粮', '豆制品', '调味干货', '水果', '其他']
+  ING_CATEGORIES: ['蔬菜菌菇', '肉禽蛋', '水产海鲜', '主食杂粮', '豆制品', '调味干货', '水果', '其他'],
+
+  // 去外卖平台：跳转用的第三方小程序 AppID（wx.navigateToMiniProgram）。
+  // ⚠️ 这三个是「美团外卖 / 淘宝闪购 / 京东外卖」他家自己的**公开**小程序 ID，
+  //    不是本项目的凭据，可以公开；换平台只改这一处，shoplist 与 history/detail 共用。
+  //    注：GitHub 密钥扫描会按「Tencent WeChat API App ID」模式把它们误报为泄露，
+  //    在 Security → Secret scanning 里逐条 Dismiss（False positive）即可。
+  TAKEOUT_PLATFORMS: [
+    { appId: 'wx2c348cf579062e56', name: '美团外卖', cls: 'meituan' },
+    { appId: 'wxece3a9a4c82f58c9', name: '淘宝闪购', cls: 'taobao' },
+    { appId: 'wxad169f0e9e78fe47', name: '京东外卖', cls: 'jd' }
+  ]
 };
