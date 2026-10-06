@@ -4,7 +4,7 @@
   "description": "env1 存量菜缺维度补齐（env1-backfill 源）：profile/reason/nutrition AI 生成",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

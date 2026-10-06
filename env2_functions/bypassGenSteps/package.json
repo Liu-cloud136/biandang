@@ -4,7 +4,7 @@
   "description": "env2 AI 生成详细菜谱步骤：hy3 生成 dish_mirror 缺 steps 的菜的详细烹饪步骤 → 写本地 dish_mirror.steps",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

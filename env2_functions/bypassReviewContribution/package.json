@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "description": "env2 投稿 AI 初筛骨架：hy3 初筛投稿合法性/质量，前置过滤",
   "main": "index.js",
-  "dependencies": { "wx-server-sdk": "~2.6.3", "@cloudbase/node-sdk": "~3.16.0" }
+  "dependencies": { "wx-server-sdk": "~4.0.2", "@cloudbase/node-sdk": "~3.16.0" }
 }

@@ -4,6 +4,6 @@
   "description": "记录用户对推荐结果的反馈",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

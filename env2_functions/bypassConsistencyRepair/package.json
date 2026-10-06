@@ -4,7 +4,7 @@
   "description": "env2 整菜维度自洽修复引擎：一次 hy3 调用重写 mirror 食材/步骤/贴士/点评/难度，保证跨维度一致",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

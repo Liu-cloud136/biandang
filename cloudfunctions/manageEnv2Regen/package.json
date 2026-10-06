@@ -4,6 +4,6 @@
   "description": "env1 侧 env2 菜审核桥接：batchPreview/batchApprove/rejectWithReason/regenDish/resyncRegen/listRegen",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

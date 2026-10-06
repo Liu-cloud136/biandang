@@ -4,7 +4,7 @@
   "description": "env2 非实时文本：hy3 生成 dish_mirror 缺 tips 的菜的贴士 → 写本地 dish_mirror.tips",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }
