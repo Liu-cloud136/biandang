@@ -1,0 +1,9 @@
+{
+  "name": "seedIngLib",
+  "version": "1.0.0",
+  "description": "temporary: seed ingredient_library from ingredients.json",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

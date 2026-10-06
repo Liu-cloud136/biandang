@@ -1,0 +1,9 @@
+{
+  "name": "rateDish",
+  "version": "1.0.0",
+  "description": "B2 做过了/打分闭环",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

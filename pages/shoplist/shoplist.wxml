@@ -1,0 +1,82 @@
+<page-meta page-style="{{ showDetail ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <!-- 空态 -->
+  <view class="empty" wx:if="{{!loading && total === 0}}">
+    <view class="emoji">🛒</view>
+    <view>清单还是空的</view>
+    <view class="sub">在历史里点「加入购菜清单」一键导入</view>
+  </view>
+
+  <!-- 列表（待买优先，已购沉底折叠） -->
+  <view class="tip" wx:if="{{total > 0}}">点菜名查看食材详情 · 左侧勾选已购（已购自动沉底）</view>
+  <view class="list" wx:if="{{total > 0}}">
+    <!-- 待买 -->
+    <view class="item" wx:for="{{pending}}" wx:key="_i">
+      <block wx:if="{{item.group}}">
+        <view class="check {{item.checked ? 'on' : ''}}" catchtap="onToggle" data-idx="{{item._i}}">
+          <text wx:if="{{item.checked}}">✓</text>
+        </view>
+        <view class="text" catchtap="onOpenDetail" data-idx="{{item._i}}">{{item.group}}</view>
+        <view class="del" catchtap="onRemove" data-idx="{{item._i}}">✕</view>
+      </block>
+      <block wx:else>
+        <view class="check {{item.checked ? 'on' : ''}}" catchtap="onToggle" data-idx="{{item._i}}">
+          <text wx:if="{{item.checked}}">✓</text>
+        </view>
+        <view class="text" catchtap="onToggle" data-idx="{{item._i}}">{{item.text}}{{item.qty ? ' x' + item.qty : ''}}</view>
+        <view class="tag">手动</view>
+        <view class="del" catchtap="onRemove" data-idx="{{item._i}}">✕</view>
+      </block>
+    </view>
+
+    <!-- 已购（不折叠，沉底展示） -->
+    <view class="item done" wx:for="{{bought}}" wx:key="_i">
+      <block wx:if="{{item.group}}">
+        <view class="check on" catchtap="onToggle" data-idx="{{item._i}}"><text>✓</text></view>
+        <view class="text" catchtap="onOpenDetail" data-idx="{{item._i}}">{{item.group}}</view>
+        <view class="del" catchtap="onRemove" data-idx="{{item._i}}">✕</view>
+      </block>
+      <block wx:else>
+        <view class="check on" catchtap="onToggle" data-idx="{{item._i}}"><text>✓</text></view>
+        <view class="text" catchtap="onToggle" data-idx="{{item._i}}">{{item.text}}{{item.qty ? ' x' + item.qty : ''}}</view>
+        <view class="tag">手动</view>
+        <view class="del" catchtap="onRemove" data-idx="{{item._i}}">✕</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="foot" wx:if="{{total > 0}}">
+    <view class="foot-btn ghost" catchtap="onClearBought">清除已购</view>
+    <view class="foot-btn danger" catchtap="onClearAll">清空</view>
+    <view class="foot-btn takeout" catchtap="onShowTakeout">去外卖</view>
+  </view>
+
+  <!-- 去外卖：自绘平台选择弹窗 -->
+  <view class="takeout-mask" wx:if="{{showTakeout}}" catchtap="closeTakeout">
+    <view class="takeout-box" catchtap="noop">
+      <view class="takeout-title">选择外卖平台</view>
+      <view class="takeout-sub">将跳转到对应小程序自行下单</view>
+      <view class="takeout-opt" wx:for="{{takeoutPlatforms}}" wx:key="appId" catchtap="onPickPlatform" data-appid="{{item.appId}}" data-name="{{item.name}}">
+        <text class="takeout-ico {{item.cls}}">{{item.name[0]}}</text>
+        <text class="takeout-label">{{item.name}}</text>
+      </view>
+      <view class="takeout-cancel" catchtap="closeTakeout">取消</view>
+    </view>
+  </view>
+
+  <!-- 食材详情弹窗（点菜名进入，自绘） -->
+  <view class="detail-mask" wx:if="{{showDetail}}" catchtap="closeDetail">
+    <view class="detail-box" catchtap="noop">
+      <view class="detail-title">{{detailName}}</view>
+      <view class="detail-scroll">
+        <text wx:for="{{detailItems}}" wx:key="*this" class="detail-ing">{{item}}</text>
+        <view wx:if="{{!detailItems.length}}" class="detail-empty">暂无食材，已加入清单</view>
+      </view>
+      <view class="detail-actions">
+        <view class="detail-close" catchtap="closeDetail">关闭</view>
+        <view class="detail-copy" catchtap="onCopyList">复制食材</view>
+      </view>
+    </view>
+  </view>
+</view>

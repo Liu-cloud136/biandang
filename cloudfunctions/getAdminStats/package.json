@@ -1,0 +1,9 @@
+{
+  "name": "getAdminStats",
+  "version": "1.0.0",
+  "description": "管理后台数据看板统计（只读，仅管理员）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "streamProbe",
+  "version": "1.0.0",
+  "description": "流式首字探针（真 AI 流式 v2：hy3 streamText + SSE）",
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

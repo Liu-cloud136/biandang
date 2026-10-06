@@ -1,0 +1,21 @@
+{ "_id": "gn_chaojidanxiangcai", "term": "炒鸡蛋香菜", "type": "example", "note": "小料后缀怪名（getRecommendation 注释：炒鸡蛋香菜）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_suanxiangbanjiucai", "term": "蒜香拌韭菜", "type": "example", "note": "怪异拼接示例（MEMORY：蒜香拌韭菜）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_qingcaichaoliji", "term": "青菜炒里脊肉", "type": "example", "note": "前缀机械拼接（BAD_PREFIX 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_suantianjianniuliiji", "term": "酸甜煎牛里脊", "type": "example", "note": "前缀机械拼接（BAD_PREFIX 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_wuxiangjiandan", "term": "五香煎鸡蛋", "type": "example", "note": "前缀机械拼接（BAD_PREFIX 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_jianniulijingcai", "term": "煎牛里脊青菜", "type": "example", "note": "菜类偏好词拼尾巴（MEAT_TAIL 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_dunzhuroulijijingcai", "term": "炖猪肉里脊青菜", "type": "example", "note": "菜类偏好词拼尾巴（MEAT_TAIL 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_jiandanpei", "term": "煎鸡蛋配", "type": "example", "note": "悬空连接词收尾（DANGLING 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_niulijikao", "term": "牛里脊烤", "type": "example", "note": "尾动词悬空（COOK_TAIL 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_niuroudun", "term": "牛肉炖", "type": "example", "note": "尾动词悬空（COOK_TAIL 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_jirouzheng", "term": "鸡肉蒸", "type": "example", "note": "尾动词悬空（COOK_TAIL 示例）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_niurouxilankaocha", "term": "牛肉西兰花炒", "type": "example", "note": "做法词堆末尾错误示范（提示词规则4）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_yarouqingjiaoliangban", "term": "鸭肉青椒凉拌", "type": "example", "note": "做法词堆末尾错误示范（提示词规则4）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_suanxiangchaohuanggua", "term": "蒜香炒黄瓜", "type": "example", "note": "蒜香+菜拼接怪名（用户反馈示例，同类：蒜香拌韭菜）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_xiangcai", "term": "香菜", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+香菜』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_cong", "term": "葱", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+葱』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_suan", "term": "蒜", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+蒜』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_jiang", "term": "姜", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+姜』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_lajiao", "term": "辣椒", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+辣椒』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "bl_dasuan", "term": "大蒜", "type": "ingredient", "note": "调味小料泛化兜底（GARNISH：专剥『X+大蒜』类狗屁不通名）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }
+{ "_id": "gn_suanxiangchaohuluobo", "term": "蒜香炒胡萝卜", "type": "example", "note": "蒜香+菜拼接怪名（用户反馈示例，同类：蒜香拌韭菜/蒜香炒黄瓜）", "ts": { "$date": "2026-07-18T00:00:00.000Z" } }

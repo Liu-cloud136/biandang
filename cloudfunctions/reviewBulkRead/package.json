@@ -1,0 +1,9 @@
+{
+  "name": "reviewBulkRead",
+  "version": "1.0.0",
+  "description": "env1 内部批量读（review-web 专用，token + 集合白名单，一次调用取一批 _id 文档）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

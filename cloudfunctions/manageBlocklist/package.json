@@ -1,0 +1,9 @@
+{
+  "name": "manageBlocklist",
+  "version": "1.0.0",
+  "description": "全局禁用词（怪异菜名/忌口食材）后台管理",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

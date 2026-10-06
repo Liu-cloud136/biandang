@@ -1,0 +1,95 @@
+<view class="tuning-page">
+  <view class="tuning-guide">
+    <view class="tg-title">各参数含义</view>
+    <view class="tg-item"><text class="tg-name">尝鲜意愿</text>控制要不要推没吃过的菜：低=只推喜欢的旧菜；高=主动推没吃过的菜</view>
+    <view class="tg-item"><text class="tg-name">口味微调</text>整体口味偏淡或偏重一级（-2=偏淡，+2=偏重）</view>
+    <view class="tg-item"><text class="tg-name">重复度</text>同菜至少隔几天再推（0=不限制）</view>
+    <view class="tg-item"><text class="tg-name">惊喜度</text>控制点「想尝试」时出的菜有多跳：低=略有不同；高=完全不按你口味来</view>
+    <view class="tg-item"><text class="tg-name">念旧 ↔ 喜新</text>控制吃过的菜的喜好能管多久：左=喜新（老菜很快不爱了，只认最近口味）；右=念旧（老菜一直爱，历史口味都算数）；默认50均衡</view>
+  </view>
+  <view class="tuning-card">
+    <view class="tuning-row">
+      <view class="t-label">尝鲜意愿</view>
+      <view class="t-ctrl">
+        <slider class="t-slider" min="0" max="100" step="10" value="{{tuning.explore}}" data-key="explore" bindchange="onTuningSlide" bindchanging="onTuningSlide" activeColor="#FF8C42" block-size="20"/>
+        <text class="t-val">{{tuning.explore}}</text>
+      </view>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">口味微调</view>
+      <view class="t-ctrl">
+        <slider class="t-slider" min="-2" max="2" value="{{tuning.tasteShift}}" data-key="tasteShift" bindchange="onTuningSlide" bindchanging="onTuningSlide" activeColor="#FF8C42" block-size="20"/>
+        <text class="t-val">{{tuning.tasteShift > 0 ? '+' : ''}}{{tuning.tasteShift}}</text>
+      </view>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">健康倾向</view>
+      <radio-group class="t-radio" bindchange="onTuningRadio" data-key="health">
+        <label class="t-radio-item"><radio value="casual" checked="{{tuning.health === 'casual'}}" color="#FF8C42"/>随意</label>
+        <label class="t-radio-item"><radio value="light" checked="{{tuning.health === 'light'}}" color="#FF8C42"/>少油清淡</label>
+        <label class="t-radio-item"><radio value="lowcal" checked="{{tuning.health === 'lowcal'}}" color="#FF8C42"/>低卡轻食</label>
+      </radio-group>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">下厨复杂度</view>
+      <radio-group class="t-radio" bindchange="onTuningRadio" data-key="complexity">
+        <label class="t-radio-item"><radio value="quick" checked="{{tuning.complexity === 'quick'}}" color="#FF8C42"/>快手</label>
+        <label class="t-radio-item"><radio value="mid" checked="{{tuning.complexity === 'mid'}}" color="#FF8C42"/>适中</label>
+        <label class="t-radio-item"><radio value="hard" checked="{{tuning.complexity === 'hard'}}" color="#FF8C42"/>硬核</label>
+      </radio-group>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">营养目标</view>
+      <radio-group class="t-radio" bindchange="onTuningRadio" data-key="nutrition">
+        <label class="t-radio-item"><radio value="none" checked="{{tuning.nutrition === 'none'}}" color="#FF8C42"/>无</label>
+        <label class="t-radio-item"><radio value="muscle" checked="{{tuning.nutrition === 'muscle'}}" color="#FF8C42"/>增肌</label>
+        <label class="t-radio-item"><radio value="fatloss" checked="{{tuning.nutrition === 'fatloss'}}" color="#FF8C42"/>减脂</label>
+        <label class="t-radio-item"><radio value="lowsugar" checked="{{tuning.nutrition === 'lowsugar'}}" color="#FF8C42"/>控糖</label>
+      </radio-group>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">一人食 / 多人餐</view>
+      <radio-group class="t-radio" bindchange="onTuningRadio" data-key="serving">
+        <label class="t-radio-item"><radio value="solo" checked="{{tuning.serving === 'solo'}}" color="#FF8C42"/>一人食</label>
+        <label class="t-radio-item"><radio value="multi" checked="{{tuning.serving === 'multi'}}" color="#FF8C42"/>多人餐</label>
+      </radio-group>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">应季时令优先</view>
+      <view class="t-ctrl">
+        <switch class="t-switch" checked="{{tuning.seasonal}}" data-key="seasonal" bindchange="onTuningSwitch" color="#FF8C42"/>
+      </view>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">重复度</view>
+      <view class="t-ctrl">
+        <slider class="t-slider" min="0" max="30" value="{{tuning.repeatGuard}}" data-key="repeatGuard" bindchange="onTuningSlide" bindchanging="onTuningSlide" activeColor="#FF8C42" block-size="20"/>
+        <text class="t-val">{{tuning.repeatGuard}}天</text>
+      </view>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">念旧 ↔ 喜新</view>
+      <view class="t-ctrl">
+        <slider class="t-slider" min="0" max="100" step="10" value="{{tuning.recency}}" data-key="recency" bindchange="onTuningSlide" bindchanging="onTuningSlide" activeColor="#FF8C42" block-size="20"/>
+        <text class="t-val">{{tuning.recency}}</text>
+      </view>
+    </view>
+
+    <view class="tuning-row">
+      <view class="t-label">惊喜度</view>
+      <view class="t-ctrl">
+        <slider class="t-slider" min="0" max="100" step="10" value="{{tuning.surprise}}" data-key="surprise" bindchange="onTuningSlide" bindchanging="onTuningSlide" activeColor="#FF8C42" block-size="20"/>
+        <text class="t-val">{{tuning.surprise}}</text>
+      </view>
+    </view>
+    <view class="tuning-save {{saving ? 'dis' : ''}}" bindtap="saveTuning">{{saving ? '保存中…' : '保存'}}</view>
+  </view>
+</view>

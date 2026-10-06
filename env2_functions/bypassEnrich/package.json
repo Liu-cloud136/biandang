@@ -1,0 +1,9 @@
+{
+  "name": "bypassEnrich",
+  "version": "1.0.0",
+  "description": "env2 三库富集（菜名/食材/营养）异步补充",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

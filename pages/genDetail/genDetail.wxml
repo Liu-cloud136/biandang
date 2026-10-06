@@ -1,0 +1,113 @@
+<page-meta page-style="{{ (showGuide || showRate) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <view class="loading" wx:if="{{loading && !loaded}}">加载中...</view>
+
+  <!-- 一周菜单：按天平铺每道菜（早午晚混排），横排三按钮 -->
+  <view class="w-body" wx:if="{{loaded && type === 'week'}}">
+    <view class="w-day" wx:for="{{items}}" wx:for-item="day" wx:key="label">
+      <view class="w-day-head">{{day.label}}</view>
+      <view class="w-card" wx:for="{{day.meals}}" wx:for-item="m" wx:key="index">
+        <view class="w-card-main">
+          <text class="w-meal-tag">{{m.mealShort}}</text>
+          <text class="w-dish">{{m.name}}</text>
+        </view>
+        <view class="dish-btns">
+          <view class="heart {{m._rated || ratedMap[m.name] ? 'on ' + (m._rated || ratedMap[m.name]) : ''}}" catchtap="onShowRate" data-name="{{m.name}}">{{m._rated || ratedMap[m.name] ? '♥' : '♡'}}</view>
+          <view wx:if="{{!m.inList}}" class="mini add" catchtap="onAddOne" data-name="{{m.name}}">🛒</view>
+          <view wx:else class="mini add done" catchtap="onAddedTip">✓</view>
+          <view class="mini cook" catchtap="onCook" data-name="{{m.name}}">看做法</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 现有食材 / 剩菜改造 -->
+  <view class="f-body" wx:if="{{loaded && type !== 'week'}}">
+    <view class="f-item" wx:for="{{items}}" wx:key="index">
+      <view class="f-name">{{item.name}}</view>
+      <view class="dish-btns">
+        <view class="heart {{ratedMap[item.name] ? 'on ' + ratedMap[item.name] : ''}}" catchtap="onShowRate" data-name="{{item.name}}">{{ratedMap[item.name] ? '♥' : '♡'}}</view>
+        <view wx:if="{{!item.inList}}" class="mini add" catchtap="onAddOne" data-name="{{item.name}}">🛒</view>
+        <view wx:else class="mini add done" catchtap="onAddedTip">✓</view>
+        <view class="mini cook" catchtap="onCook" data-name="{{item.name}}">看做法</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{loaded && items.length === 0}}">这条记录没有内容</view>
+
+  <!-- 做法弹层 -->
+  <view wx:if="{{showGuide}}" class="guide-mask" bindtap="onCloseGuide" catchtouchmove="noop">
+    <view class="guide-box" catchtap="noop">
+      <view class="guide-head">
+        <view class="guide-title">{{guide.name}} · 做法</view>
+        <view class="fav-btn {{favOn ? 'on' : ''}} {{guideLoading ? 'disabled' : ''}}" catchtap="onToggleFav">{{favOn ? '★' : '☆'}}</view>
+        <text wx:if="{{favCount != null && favCount > 0}}" class="fav-count">{{favCount}}</text>
+      </view>
+      <view wx:if="{{guide.difficulty}}" class="guide-diff-center">
+        <text class="guide-tag diff">难度 · {{guide.difficulty}}</text>
+      </view>
+      <view wx:if="{{guideLoading}}" class="guide-loading">准备中…</view>
+      <scroll-view wx:else scroll-y class="guide-scroll">
+        <view class="guide-sec">所需食材</view>
+        <view wx:if="{{guide.ingMain && guide.ingMain.length}}">
+          <view wx:for="{{guide.ingMain}}" wx:for-item="ing" wx:key="*this" class="guide-li">· {{ing}}</view>
+        </view>
+        <view wx:if="{{guide.seasonLine}}" class="guide-season">调料：{{guide.seasonLine}}</view>
+        <view wx:if="{{!(guide.ingMain && guide.ingMain.length) && !guide.seasonLine}}" class="guide-empty">暂无食材信息</view>
+        <view class="guide-sec">烹饪步骤</view>
+        <view wx:for="{{guide.steps}}" wx:for-item="st" wx:for-index="si2" wx:key="index" class="guide-li">{{si2 + 1}}. {{st}}</view>
+        <view wx:if="{{!guide.steps.length}}" class="guide-empty">暂无步骤信息</view>
+        <block wx:if="{{guide.tips}}">
+          <view class="guide-sec">小贴士</view>
+          <view class="guide-review">{{guide.tips}}</view>
+        </block>
+        <view class="guide-sec">点评</view>
+        <view wx:if="{{guide.review}}" class="guide-review">{{guide.review}}</view>
+        <view wx:else class="guide-empty">暂无点评</view>
+        <view class="guide-report" catchtap="onReportDish" data-name="{{guide.name}}">不喜欢 / 觉得有问题？反馈一下</view>
+      </scroll-view>
+      <view class="guide-close {{guideLoading ? 'disabled' : ''}}" catchtap="onCloseGuide">关闭</view>
+    </view>
+  </view>
+
+  <!-- 评价弹窗：选 好吃 / 一般 / 不合胃口 -->
+  <view wx:if="{{showRate}}" class="rate-mask" bindtap="onCloseRate" catchtouchmove="noop">
+    <view class="rate-box" catchtap="noop">
+      <view class="rate-btns">
+        <view class="rate-tag good" catchtap="onRatePick" data-rating="good">好吃</view>
+        <view class="rate-tag normal" catchtap="onRatePick" data-rating="normal">一般</view>
+        <view class="rate-tag bad" catchtap="onRatePick" data-rating="bad">难吃</view>
+      </view>
+      <view class="rate-cancel" bindtap="onCloseRate">取消</view>
+    </view>
+  </view>
+
+  <!-- 收藏选择弹层 -->
+  <view wx:if="{{showFav}}" class="fav-mask" bindtap="onCloseFav" catchtouchmove="noop">
+    <view class="fav-box" catchtap="noop">
+      <view class="fav-opt" catchtap="onFavLocal" data-name="{{favItem.name}}">
+        <view class="fav-opt-main">本地收藏<view class="fav-opt-tag free">免费</view></view>
+        <view class="fav-opt-desc">仅存于本机，不消耗每日次数，换设备不保留。</view>
+      </view>
+      <view class="fav-opt cloud" catchtap="onFavCloud" data-name="{{favItem.name}}">
+        <view class="fav-opt-main">云端收藏<view class="fav-opt-tag cost" wx:if="{{!favCloud}}">耗 1 次</view></view>
+        <view class="fav-opt-desc">{{favCloud ? '已跨设备同步' : '跨设备保留，消耗免费次数'}}</view>
+      </view>
+      <view class="fav-cancel btn-ghost" bindtap="onCloseFav">取消</view>
+    </view>
+  </view>
+
+  <!-- 反馈补充说明（阶段5② 自定义大输入框，替代系统 editable 弹窗） -->
+  <view wx:if="{{rep.show}}" class="rep-mask" bindtap="onRepNoteCancel" catchtouchmove="noop">
+    <view class="rep-box" catchtap="noop">
+      <view class="rep-title">补充说明（选填）</view>
+      <textarea class="rep-text" value="{{rep.text}}" bindinput="onRepNoteInput" maxlength="200"
+        placeholder="例如：盐太多 / 搭配奇怪 / 步骤不对（最多 200 字）" placeholder-class="rep-ph" cursor-spacing="12"></textarea>
+      <view class="rep-actions">
+        <view class="rep-btn cancel" catchtap="onRepNoteCancel">取消</view>
+        <view class="rep-btn ok" catchtap="onRepNoteSubmit">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

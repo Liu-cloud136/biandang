@@ -1,0 +1,63 @@
+<view class="page">
+  <!-- 离线提示（E12）：无网络时展示本地缓存 -->
+  <view wx:if="{{offline}}" class="offline-bar">📡 当前无网络，展示本地缓存（恢复网络后自动刷新）</view>
+  <!-- 时间筛选：有记录时才显示 -->
+  <view class="filter-bar" wx:if="{{allCount > 0}}">
+    <view class="chip {{filter==='all' ? 'on' : ''}}" data-f="all" catchtap="onFilter">全部</view>
+    <view class="chip {{filter==='today' ? 'on' : ''}}" data-f="today" catchtap="onFilter">今天</view>
+    <view class="chip {{filter==='threeday' ? 'on' : ''}}" data-f="threeday" catchtap="onFilter">近3天</view>
+    <view class="chip {{filter==='week' ? 'on' : ''}}" data-f="week" catchtap="onFilter">近7天</view>
+  </view>
+  <view class="list-hint" wx:if="{{allCount > 0}}">点击卡片进入 · 长按卡片删除</view>
+
+  <!-- 完全没有记录 -->
+  <view class="empty" wx:if="{{!loading && allCount===0}}">
+    <view class="emoji">📭</view>
+    <view>还没有任何决定</view>
+    <view class="sub">去首页点「帮我决定」试试吧</view>
+  </view>
+
+  <!-- 有记录但当前时间段无结果 -->
+  <view class="empty filtered" wx:if="{{!loading && allCount>0 && visibleCount===0}}">
+    <view class="emoji">🗓️</view>
+    <view>该时间段没有决定记录</view>
+    <view class="sub">换个时间范围看看吧</view>
+  </view>
+
+  <view class="card-wrap" wx:for="{{list}}" wx:key="_id" hidden="{{item._hidden}}">
+    <view class="card {{item.sceneCount >= 2 ? 'multi' : ''}}"
+          data-id="{{item._id}}"
+          bindtap="onTapCard"
+          bindlongpress="onLongPress">
+      <!-- 多场景：分段标签切换当前场景 -->
+      <view wx:if="{{item.sceneCount >= 2}}" class="seg">
+        <view wx:for="{{item.blocks}}" wx:for-item="b" wx:for-index="bi" wx:key="scene"
+              class="seg-item {{item.activeScene === bi ? 'on' : ''}}"
+              data-id="{{item._id}}" data-bi="{{bi}}" catchtap="onSwitchScene">{{b.scene}}</view>
+      </view>
+      <view class="rows">
+        <view class="srow">
+          <view class="mini-row">
+            <view class="mini">
+              <view class="mini-img {{item.activeBlock.dish ? '' : 'ph'}}">
+                <image wx:if="{{item.activeBlock.dish && !item._imgErrDish}}" class="mini-img-img" src="{{item.activeBlock.dish.imageUrl}}" mode="aspectFill" lazy-load binderror="onImgErr" data-id="{{item._id}}" data-kind="dish"></image>
+                <text wx:else>🍱</text>
+              </view>
+              <view class="mini-cap"><text class="tag {{item.activeBlock.scene === '小吃' ? '' : item.activeBlock.scene === '下午茶' ? 'tea' : ''}}">{{item.activeBlock.dishTag || (item.activeBlock.scene === '下午茶' ? '糕点' : '菜')}}</text>{{item.activeBlock.dish ? item.activeBlock.dish.name : '未选'}}</view>
+            </view>
+            <view class="mini">
+              <view class="mini-img {{item.activeBlock.staple ? '' : 'ph'}}">
+                <image wx:if="{{item.activeBlock.staple && !item._imgErrStaple}}" class="mini-img-img" src="{{item.activeBlock.staple.imageUrl}}" mode="aspectFill" lazy-load binderror="onImgErr" data-id="{{item._id}}" data-kind="staple"></image>
+                <text wx:else>{{item.activeBlock.scene === '下午茶' ? '🍵' : '🍚'}}</text>
+              </view>
+              <view class="mini-cap"><text class="tag staple {{item.activeBlock.scene === '下午茶' ? 'tea' : ''}}">{{item.activeBlock.stapleTag || '饭'}}</text>{{item.activeBlock.staple ? item.activeBlock.staple.name : '未选'}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="foot">
+        <text class="date">{{item.date}}</text>
+      </view>
+    </view>
+  </view>
+</view>

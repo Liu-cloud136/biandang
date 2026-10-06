@@ -1,0 +1,71 @@
+page {
+  /* 切勿加 overflow:hidden / height:100%：会掐死所有走原生滚动的页面（历史/我的/收藏/设置），
+     导致"整页能拖+内容滚不动+顶部回弹"。首页用 position:fixed+scroll-view 自己管滚动，不受影响。 */
+  overscroll-behavior-y: none;
+  background-color: #FDF8F4;
+  color: #333333;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  -webkit-overflow-scrolling: touch;
+}
+
+.container {
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+/* 主按钮 */
+.btn-primary {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(135deg, #FF8C42 0%, #E8533E 100%);
+  color: #ffffff;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 22rpx 24rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(255, 140, 66, 0.32);
+}
+.btn-primary:active { opacity: 0.88; }
+
+.btn-ghost {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #ffffff;
+  color: #E8533E;
+  border: 2rpx solid #FFD9C2;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  line-height: 1.4;
+  padding: 20rpx 24rpx;
+  text-align: center;
+}
+.btn-ghost:active { background: #FFF1E8; }
+
+/* 原生 button 作为按钮时重置默认样式（去除默认宽度/边框，由 flex 控制布局） */
+button.btn-primary,
+button.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  line-height: 1.4;
+}
+button.btn-primary::after,
+button.btn-ghost::after { border: none; }
+
+/* 操作行：多按钮等分布局，防止溢出 */
+.actions { display: flex; gap: 24rpx; }
+.actions .btn-primary,
+.actions .btn-ghost { flex: 1; min-width: 0; }
+
+.muted { color: #999; font-size: 24rpx; }

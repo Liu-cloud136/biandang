@@ -1,0 +1,31 @@
+<view class="page" style="--nav-h: {{navH}};">
+  <!-- 作者介绍区 -->
+  <view class="hero">
+    <view class="hero-avatar">
+      <image class="hero-img" src="./author-avatar.jpg" mode="aspectFill"></image>
+    </view>
+    <view class="hero-name">鸽神本鸽</view>
+  </view>
+
+  <!-- 各平台账号 - shields 风格徽章平铺在标题下 -->
+  <view class="platform-list">
+    <view class="badge" bindtap="copyId" data-text="478719788">
+      <text class="badge-label bili">哔哩哔哩</text><text class="badge-value">478719788</text>
+    </view>
+    <view class="badge" bindtap="copyId" data-text="23660230">
+      <text class="badge-label heibox">小黑盒</text><text class="badge-value">23660230</text>
+    </view>
+    <view class="badge" bindtap="copyId" data-text="Gothers">
+      <text class="badge-label douyin">抖音</text><text class="badge-value">Gothers</text>
+    </view>
+    <view class="badge" bindtap="copyId" data-text="3290936682">
+      <text class="badge-label kuaishou">快手</text><text class="badge-value">3290936682</text>
+    </view>
+    <view class="badge" bindtap="copyId" data-text="675299209">
+      <text class="badge-label xhs">小红书</text><text class="badge-value">675299209</text>
+    </view>
+    <view class="badge" bindtap="copyText" data-text="鸽神本鸽">
+      <text class="badge-label weibo">微博</text><text class="badge-value">@鸽神本鸽</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,9 @@
+{
+  "name": "favorite",
+  "version": "1.0.0",
+  "description": "收藏：本地免费 + 云端收藏（消耗 1 次免费次数）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

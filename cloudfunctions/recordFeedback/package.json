@@ -1,0 +1,9 @@
+{
+  "name": "recordFeedback",
+  "version": "1.0.0",
+  "description": "记录用户对推荐结果的反馈",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

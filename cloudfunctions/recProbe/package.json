@@ -1,0 +1,9 @@
+{
+  "name": "recProbe",
+  "version": "1.0.0",
+  "description": "临时探针：测完整 getRecommendation(sceneMode) 真实耗时",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

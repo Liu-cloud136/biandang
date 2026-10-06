@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "timeout": 60,
+  "triggers": [
+    {
+      "name": "dailyComputeCF",
+      "type": "timer",
+      "config": "0 30 4 * * * *"
+    }
+  ]
+}

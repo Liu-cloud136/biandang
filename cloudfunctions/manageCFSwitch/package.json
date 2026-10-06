@@ -1,0 +1,9 @@
+{
+  "name": "manageCFSwitch",
+  "version": "1.0.0",
+  "description": "CF影子模式开关与就绪进度管理",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

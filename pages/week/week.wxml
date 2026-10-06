@@ -1,0 +1,46 @@
+<page-meta page-style="{{ (showCostConfirm || loading) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <!-- 上部功能区 -->
+  <view class="func">
+    <view class="d-label">规划天数</view>
+    <view class="day-row">
+      <view class="day {{activeIndex === index ? 'on' : ''}}" wx:for="{{dayOpts}}" wx:key="index" bindtap="onDay" data-idx="{{index}}">{{item}}天</view>
+    </view>
+    <view class="f-tip" wx:if="{{result.length === 0 && msg}}">{{msg}}</view>
+    <view class="f-actions">
+      <view class="f-btn confirm {{loading ? 'loading' : ''}}" bindtap="onWeekSubmit">安排一周</view>
+    </view>
+  </view>
+
+  <!-- 下部记录区 -->
+  <view class="rec-head">
+    <text class="rec-title">历史记录</text>
+    <text class="rec-hint">点击进入 · 长按删除</text>
+  </view>
+  <view class="rec-empty" wx:if="{{records.length === 0}}">还没有记录，快试一次吧</view>
+  <view class="rec-card" wx:for="{{records}}" wx:key="_id" bindtap="onOpenRecord" bindlongpress="onDeleteRecord" data-id="{{item._id}}" data-type="week">
+    <view class="rec-time">{{item._hm}}</view>
+  </view>
+
+  <!-- 消耗次数二次确认 -->
+  <view wx:if="{{showCostConfirm}}" class="claim-mask" catchtap="onCostCancel" catchtouchmove="noop">
+    <view class="claim-box cost-box" catchtap="noop">
+      <view class="claim-title">确认消耗次数</view>
+      <view class="cost-desc">本次将消耗 <text class="cost-num">{{costDays}}</text> 次免费次数，确定吗？</view>
+      <view class="claim-actions">
+        <view class="claim-btn cancel" bindtap="onCostCancel">再想想</view>
+        <view class="claim-btn confirm" bindtap="onCostConfirm">就这样</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生成中：自绘加载弹窗（含不确定态流光进度条，与主页风格一致） -->
+  <view wx:if="{{loading}}" class="gen-mask" catchtap="noop" catchtouchmove="noop">
+    <view class="gen-box" catchtap="noop">
+      <view class="gen-spin"></view>
+      <view class="gen-title">{{loadingText}}</view>
+      <view class="gen-bar"><view class="gen-bar-fill"></view></view>
+      <view class="gen-tip">正在替你盘算一周的吃法，稍等一下～</view>
+    </view>
+  </view>
+</view>

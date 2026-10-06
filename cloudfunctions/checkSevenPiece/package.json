@@ -1,0 +1,9 @@
+{
+  "name": "checkSevenPiece",
+  "version": "1.0.0",
+  "description": "检查 env1 通过审核和待审核菜的 7 件套完整性",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

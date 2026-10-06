@@ -1,0 +1,131 @@
+<page-meta page-style="{{ (showGuide || showFav || showRate) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <view class="date" wx:if="{{date}}">{{date}}</view>
+
+  <block wx:for="{{groups}}" wx:for-item="group" wx:for-index="si" wx:key="scene">
+    <view class="scene-title">{{group.scene}}</view>
+
+    <!-- 菜品列表 -->
+    <block>
+      <view class="dish" wx:for="{{group.items}}" wx:for-item="item" wx:for-index="ii" wx:key="name">
+        <image wx:if="{{item.localImg || item.imageUrl}}" class="img" src="{{item.localImg || item.imageUrl}}" mode="aspectFill" />
+        <view wx:else class="img placeholder">🍱</view>
+        <view class="info">
+          <view class="name"><text class="tag" wx:if="{{item.kind}}">{{item.kind === '主食' ? '饭' : item.kind}}</text>{{item.name}}</view>
+          <view class="nutri">
+            <view class="row" wx:if="{{item.cuisine && item.kind !== '主食' && item.kind !== '饮料' && item.kind !== '饮品'}}"><text class="k">菜系</text><text class="v">{{item.cuisine}}</text></view>
+            <view class="row" wx:if="{{item.calories}}"><text class="k">热量</text><text class="v">{{item.calories}}</text></view>
+            <view class="row" wx:if="{{item.protein}}"><text class="k">蛋白质</text><text class="v">{{item.protein}}</text></view>
+            <view class="row" wx:if="{{item.carb}}"><text class="k">碳水</text><text class="v">{{item.carb}}</text></view>
+            <view class="row" wx:if="{{item.fat}}"><text class="k">脂肪</text><text class="v">{{item.fat}}</text></view>
+          </view>
+        </view>
+        <view class="dish-actions">
+          <view wx:if="{{item.showCook}}" class="cook-btn" catchtap="onCook" data-si="{{si}}" data-name="{{item.name}}">看做法</view>
+          <view wx:if="{{item.showCook && !item.inList}}" class="add-list-btn" catchtap="onAddDish" data-si="{{si}}" data-name="{{item.name}}">加入清单</view>
+          <view wx:elif="{{item.showCook}}" class="add-list-btn done" catchtap="onAddedTip">已加入</view>
+          <view wx:if="{{item.kind !== '饮'}}" class="rate-mini" catchtap="onShowRate" data-si="{{si}}" data-ii="{{ii}}" data-name="{{item.name}}">
+            <text wx:if="{{!item.rated}}">做过了?</text>
+            <text wx:else class="rated rated-{{item.rated}}">{{item.rated === 'good' ? '好吃' : item.rated === 'bad' ? '难吃' : '一般'}}</text>
+          </view>
+          <view class="takeout-btn" catchtap="onShowTakeout" data-name="{{item.name}}">去外卖</view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <view wx:if="{{empty}}" class="empty">本次未记录所选菜品</view>
+
+  <!-- 批量加入购菜清单 -->
+  <view class="list-add-btn" catchtap="onAddToList">批量加入购菜清单</view>
+
+  <!-- 做法弹层 -->
+  <view wx:if="{{showGuide}}" class="guide-mask" bindtap="onCloseGuide" catchtouchmove="noop">
+    <view class="guide-box" catchtap="noop">
+      <view class="guide-head">
+        <view class="guide-title">{{guide.name}} · 做法</view>
+        <view class="fav-btn {{favOn ? 'on' : ''}} {{guideLoading ? 'disabled' : ''}}" catchtap="onToggleFav">{{favOn ? '★' : '☆'}}</view>
+        <text class="fav-count" wx:if="{{favCount != null && favCount > 0}}">{{favCount}}</text>
+      </view>
+      <view wx:if="{{guide.difficulty}}" class="guide-diff-center">
+        <text class="guide-tag diff">难度 · {{guide.difficulty}}</text>
+      </view>
+      <view wx:if="{{guideLoading}}" class="guide-loading">准备中…</view>
+      <scroll-view wx:else scroll-y class="guide-scroll">
+        <view class="guide-sec">所需食材</view>
+        <view wx:if="{{guide.ingMain && guide.ingMain.length}}">
+          <view wx:for="{{guide.ingMain}}" wx:for-item="ing" wx:key="*this" class="guide-li">· {{ing}}</view>
+        </view>
+        <view wx:if="{{guide.seasonLine}}" class="guide-season">调料：{{guide.seasonLine}}</view>
+        <view wx:if="{{!(guide.ingMain && guide.ingMain.length) && !guide.seasonLine}}" class="guide-empty">暂无食材信息</view>
+        <view class="guide-sec">烹饪步骤</view>
+        <view wx:for="{{guide.steps}}" wx:for-item="st" wx:for-index="si2" wx:key="index" class="guide-li">{{si2 + 1}}. {{st}}</view>
+        <view wx:if="{{!guide.steps.length}}" class="guide-empty">暂无步骤信息</view>
+        <block wx:if="{{guide.tips}}">
+          <view class="guide-sec">小贴士</view>
+          <view class="guide-review">{{guide.tips}}</view>
+        </block>
+        <view class="guide-sec">点评</view>
+        <view wx:if="{{guide.review}}" class="guide-review">{{guide.review}}</view>
+        <view wx:else class="guide-empty">暂无点评</view>
+        <view class="guide-report" catchtap="onReportDish" data-name="{{guide.name}}">不喜欢 / 觉得有问题？反馈一下</view>
+      </scroll-view>
+      <view class="guide-close {{guideLoading ? 'disabled' : ''}}" catchtap="onCloseGuide">关闭</view>
+    </view>
+  </view>
+
+  <!-- 收藏选择弹层：本地免费 / 云端耗 1 次 -->
+  <view wx:if="{{showFav}}" class="fav-mask" bindtap="onCloseFav" catchtouchmove="noop">
+    <view class="fav-box" catchtap="noop">
+      <view class="fav-opt" bindtap="onFavLocal">
+        <view class="fav-opt-main">{{favLocal ? '取消本地收藏' : '收藏到本地'}}</view>
+        <view class="fav-opt-desc">{{favLocal ? '已在本机保留' : '即时保存，仅本机'}}</view>
+      </view>
+
+      <view class="fav-opt cloud" bindtap="onFavCloud">
+        <view class="fav-opt-main">{{favCloud ? '取消云端收藏' : '收藏到云端'}}<text class="fav-opt-tag cost" wx:if="{{!favCloud}}">耗 1 次</text></view>
+        <view class="fav-opt-desc">{{favCloud ? '已跨设备同步' : '跨设备保留，消耗免费次数'}}</view>
+      </view>
+
+      <view class="fav-cancel btn-ghost" bindtap="onCloseFav">取消</view>
+    </view>
+  </view>
+
+  <!-- B2 评价弹窗：选 好吃 / 一般 / 不合胃口 -->
+  <view wx:if="{{showRate}}" class="rate-mask" bindtap="onCloseRate" catchtouchmove="noop">
+    <view class="rate-box" catchtap="noop">
+      <view class="rate-btns">
+        <view class="rate-tag good" catchtap="onRatePick" data-rating="good">好吃</view>
+        <view class="rate-tag normal" catchtap="onRatePick" data-rating="normal">一般</view>
+        <view class="rate-tag bad" catchtap="onRatePick" data-rating="bad">难吃</view>
+      </view>
+      <view class="rate-cancel" bindtap="onCloseRate">取消</view>
+    </view>
+  </view>
+
+  <!-- 去外卖：自绘平台选择弹窗 -->
+  <view wx:if="{{showTakeout}}" class="takeout-mask" catchtap="closeTakeout">
+    <view class="takeout-box" catchtap="noop">
+      <view class="takeout-title">选择外卖平台</view>
+      <view class="takeout-sub">将跳转到对应小程序自行下单</view>
+      <view class="takeout-opt" wx:for="{{takeoutPlatforms}}" wx:key="appId" catchtap="onPickPlatform" data-appid="{{item.appId}}" data-name="{{item.name}}">
+        <text class="takeout-ico {{item.cls}}">{{item.name[0]}}</text>
+        <text class="takeout-label">{{item.name}}</text>
+      </view>
+      <view class="takeout-cancel" catchtap="closeTakeout">取消</view>
+    </view>
+  </view>
+
+  <!-- 反馈补充说明（阶段5② 自定义大输入框，替代系统 editable 弹窗） -->
+  <view wx:if="{{rep.show}}" class="rep-mask" bindtap="onRepNoteCancel" catchtouchmove="noop">
+    <view class="rep-box" catchtap="noop">
+      <view class="rep-title">补充说明（选填）</view>
+      <textarea class="rep-text" value="{{rep.text}}" bindinput="onRepNoteInput" maxlength="200"
+        placeholder="例如：盐太多 / 搭配奇怪 / 步骤不对（最多 200 字）" placeholder-class="rep-ph" cursor-spacing="12"></textarea>
+      <view class="rep-actions">
+        <view class="rep-btn cancel" catchtap="onRepNoteCancel">取消</view>
+        <view class="rep-btn ok" catchtap="onRepNoteSubmit">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

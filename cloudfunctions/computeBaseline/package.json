@@ -1,0 +1,9 @@
+{
+  "name": "computeBaseline",
+  "version": "1.0.0",
+  "description": "全量画像 baseline 统计（TGI 第二关数据来源）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

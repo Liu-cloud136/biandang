@@ -1,0 +1,9 @@
+{
+  "name": "manageLexicon",
+  "version": "1.0.0",
+  "description": "探索菜库审核（管理员）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

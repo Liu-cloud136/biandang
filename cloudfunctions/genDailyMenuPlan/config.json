@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "timeout": 120,
+  "triggers": [
+    {
+      "name": "dailyMenuPlan",
+      "type": "timer",
+      "config": "0 30 2 * * * *"
+    }
+  ]
+}

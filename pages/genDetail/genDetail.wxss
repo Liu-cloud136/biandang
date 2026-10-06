@@ -1,0 +1,86 @@
+.page { padding: 32rpx 28rpx 60rpx; min-height: 100vh; box-sizing: border-box; }
+
+.head { margin-bottom: 28rpx; }
+.h-type { font-size: 34rpx; font-weight: 700; color: #333; }
+
+.loading, .empty { text-align: center; color: #999; font-size: 28rpx; padding: 60rpx 0; }
+
+/* 一周菜单：按天平铺每道菜（早午晚混排） */
+.w-day { margin-bottom: 30rpx; }
+.w-day-head { font-size: 30rpx; font-weight: 700; color: #333; margin-bottom: 16rpx; padding-left: 4rpx; }
+.w-card { display: flex; align-items: center; justify-content: space-between; background: #fafafa; border: 1rpx solid #eee; border-radius: 12rpx; padding: 16rpx 20rpx; margin-bottom: 12rpx; }
+.w-card:last-child { margin-bottom: 0; }
+.w-card-main { flex: 1; min-width: 0; padding-right: 16rpx; }
+.w-meal-tag { display: inline-block; font-size: 20rpx; color: #FF8C42; background: #FDEEE2; border-radius: 6rpx; padding: 2rpx 8rpx; margin-right: 10rpx; vertical-align: middle; }
+.w-dish { font-size: 28rpx; font-weight: 500; color: #333; word-break: break-all; white-space: normal; }
+/* 周表三按钮统一等宽、文字居中，前（做过了?）后（加清单）长度一致 */
+.w-card .dish-btns { gap: 0; margin-left: 16rpx; }
+
+/* 现有食材 / 剩菜改造 */
+.f-item { display: flex; align-items: center; padding: 20rpx 0; border-bottom: 1rpx solid #f3ece4; }
+.f-name { flex: 1; min-width: 0; font-size: 30rpx; font-weight: 600; color: #333; }
+
+/* 每道菜后的小按钮：小爱心 / 看做法（位于菜名右侧） */
+.dish-btns { display: flex; align-items: center; gap: 0; flex-shrink: 0; margin-left: 16rpx; }
+.mini { font-size: 24rpx; padding: 10rpx 22rpx; border-radius: 999rpx; font-weight: 600; }
+.heart { width: 56rpx; min-width: 56rpx; height: 56rpx; line-height: 56rpx; text-align: center; font-size: 40rpx; color: #C9C2BC; }
+.heart.on.good { color: #FF5B5B; }
+.heart.on.normal { color: #F5B800; }
+.heart.on.bad { color: #333333; }
+.mini.cook { color: #7A6A5A; background: #F3ECE4; }
+.mini.add { display: inline-flex; align-items: center; justify-content: center; width: 56rpx; min-width: 56rpx; height: 56rpx; font-size: 36rpx; color: #FF8C42; }
+.mini.add.done { color: #2BA471; }
+
+/* 做法弹层（复用 history/detail 居中卡片样式） */
+.guide-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 48rpx; }
+.guide-box { width: 100%; max-width: 560rpx; background: #fff; border-radius: 24rpx; padding: 36rpx 32rpx 28rpx; max-height: 84vh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
+.guide-head { display: flex; align-items: center; justify-content: center; position: relative; padding: 6rpx 0 16rpx; }
+.guide-title { font-size: 34rpx; font-weight: 800; color: #333; text-align: center; }
+.fav-btn { margin-left: 16rpx; font-size: 44rpx; line-height: 1; color: #C9A24B; padding: 0 6rpx; }
+.fav-btn.on { color: #FFB020; }
+.fav-btn.disabled { opacity: 0.35; pointer-events: none; }
+.fav-count { font-size: 22rpx; color: #B0B0B0; margin-left: 8rpx; font-weight: 400; }
+.guide-diff-center { text-align: center; margin: 10rpx 0 14rpx; }
+.guide-tag.diff { font-size: 22rpx; color: #FF8C42; background: #FDEEE2; padding: 4rpx 18rpx; border-radius: 999rpx; font-weight: 600; }
+.guide-loading { text-align: center; font-size: 26rpx; color: #999; padding: 60rpx 0; }
+.guide-scroll { flex: 1; min-height: 0; max-height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 12rpx; padding-bottom: 12rpx; }
+.guide-sec { font-size: 28rpx; font-weight: 700; color: #E8533E; margin: 20rpx 0 12rpx; }
+.guide-li { font-size: 27rpx; color: #444; line-height: 1.7; }
+.guide-season { font-size: 26rpx; color: #8a8a8a; line-height: 1.7; margin: 4rpx 0 12rpx; word-break: break-all; }
+.guide-report { font-size: 24rpx; color: #b0a89a; text-align: center; margin: 20rpx 0 6rpx; text-decoration: underline; }
+.rep-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 400; }
+.rep-box { width: 84%; background: #fff; border-radius: 20rpx; padding: 30rpx 28rpx 24rpx; box-sizing: border-box; }
+.rep-title { font-size: 30rpx; font-weight: 700; color: #333; margin-bottom: 20rpx; }
+.rep-text { width: 100%; height: 220rpx; box-sizing: border-box; border: 2rpx solid #eee; border-radius: 12rpx; padding: 16rpx; font-size: 28rpx; line-height: 1.5; color: #444; background: #fafafa; }
+.rep-ph { color: #bbb; }
+.rep-actions { display: flex; margin-top: 24rpx; }
+.rep-btn { flex: 1; text-align: center; font-size: 30rpx; padding: 18rpx 0; border-radius: 30rpx; }
+.rep-btn.cancel { color: #666; background: #f2f2f2; margin-right: 16rpx; }
+.rep-btn.ok { color: #fff; background: #FF8C42; font-weight: 700; }
+.guide-review { font-size: 27rpx; color: #555; line-height: 1.7; background: #FFF6F0; border-left: 6rpx solid #FF8C42; border-radius: 12rpx; padding: 18rpx 20rpx; margin-bottom: 8rpx; }
+.guide-empty { font-size: 26rpx; color: #bbb; text-align: center; padding: 40rpx 0; }
+.guide-close { margin-top: 24rpx; text-align: center; font-size: 30rpx; font-weight: 700; color: #fff; background: #FF8C42; padding: 20rpx 0; border-radius: 30rpx; }
+.guide-close.disabled { background: #CCC; color: #fff; pointer-events: none; }
+
+/* 评价弹窗（复用 history/detail 居中卡片样式） */
+.rate-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 150; }
+.rate-box { width: 78%; background: #fff; border-radius: 24rpx; padding: 40rpx 32rpx 28rpx; box-shadow: 0 10rpx 40rpx rgba(0,0,0,0.18); box-sizing: border-box; }
+.rate-btns { display: flex; gap: 16rpx; }
+.rate-tag { flex: 1; text-align: center; font-size: 26rpx; font-weight: 700; padding: 18rpx 0; border-radius: 30rpx; border: 2rpx solid #EEE5DD; color: #666; background: #fff; }
+.rate-tag.good:active { background: #EAF7EE; border-color: #7BC78E; color: #2E8B57; }
+.rate-tag.normal:active { background: #F6EFE8; border-color: #E0D5CB; }
+.rate-tag.bad:active { background: #FDECEC; border-color: #E8533E; color: #E8533E; }
+.rate-cancel { margin-top: 28rpx; text-align: center; font-size: 28rpx; font-weight: 700; color: #fff; background: #FF8C42; padding: 18rpx 0; border-radius: 30rpx; }
+
+/* 收藏选择弹层 */
+.fav-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 48rpx; }
+.fav-box { width: 100%; max-width: 560rpx; background: #fff; border-radius: 24rpx; padding: 40rpx 36rpx 32rpx; box-sizing: border-box; }
+.fav-sub { font-size: 24rpx; color: #999; text-align: center; margin: 14rpx 0 28rpx; line-height: 1.6; }
+.fav-opt { border: 2rpx solid #F0E6DC; border-radius: 18rpx; padding: 22rpx 26rpx; margin-bottom: 20rpx; }
+.fav-opt.cloud { border-color: #FFD9B8; background: #FFF8F1; }
+.fav-opt-main { font-size: 32rpx; font-weight: 700; color: #333; display: flex; align-items: center; }
+.fav-opt-tag { font-size: 20rpx; font-weight: 600; border-radius: 999rpx; padding: 2rpx 14rpx; margin-left: 14rpx; }
+.fav-opt-tag.free { color: #2BA471; background: #E6F6EE; }
+.fav-opt-tag.cost { color: #E8533E; background: #FDE9E2; }
+.fav-opt-desc { font-size: 24rpx; color: #999; margin-top: 8rpx; }
+.fav-cancel { margin-top: 24rpx; }

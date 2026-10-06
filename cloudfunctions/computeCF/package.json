@@ -1,0 +1,9 @@
+{
+  "name": "computeCF",
+  "version": "1.0.0",
+  "description": "协同过滤离线模型（物品共现相似）— 影子模式，默认不生效，数据达标由 sys_config 开关放行",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

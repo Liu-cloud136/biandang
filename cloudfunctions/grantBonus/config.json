@@ -1,0 +1,6 @@
+{
+  "timeout": 15,
+  "envVariables": {},
+  "runtime": "Nodejs18.15",
+  "memorySize": 256
+}

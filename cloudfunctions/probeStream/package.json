@@ -1,0 +1,9 @@
+{
+  "name": "probeStream",
+  "version": "1.0.0",
+  "description": "临时探针：验证 hy3 streamText 在 CloudBase Node SDK 下的可用性",
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

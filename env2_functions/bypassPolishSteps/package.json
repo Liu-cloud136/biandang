@@ -1,0 +1,10 @@
+{
+  "name": "bypassPolishSteps",
+  "version": "1.0.0",
+  "description": "env2 轻量 AI 步骤润色：碎步骤/含链接/含成品图的菜谱步骤 → hy3 合并润色 → 写回 dish_mirror",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

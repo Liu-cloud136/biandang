@@ -1,0 +1,9 @@
+{
+  "name": "grantBonus",
+  "version": "1.0.0",
+  "description": "管理员手动发放免费次数（后台工具）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

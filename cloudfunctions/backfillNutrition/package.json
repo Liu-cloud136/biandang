@@ -1,0 +1,10 @@
+{
+  "name": "backfillNutrition",
+  "version": "1.0.0",
+  "description": "存量探索菜营养回填（断裂点1 修复补数）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest",
+    "@cloudbase/node-sdk": "latest"
+  }
+}

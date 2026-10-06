@@ -1,0 +1,9 @@
+{
+  "name": "cloudbase_auth",
+  "version": "1.0.0",
+  "description": "env2 资源方鉴权，放行 env1 跨账号读写",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

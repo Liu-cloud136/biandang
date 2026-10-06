@@ -1,0 +1,9 @@
+{
+  "name": "tempClearBackups",
+  "version": "1.0.0",
+  "description": "一次性清理旧版逐用户定时快照（按 label 前缀+desc 为空）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

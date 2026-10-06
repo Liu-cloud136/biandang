@@ -1,0 +1,10 @@
+{
+  "name": "bypassNutritionEst",
+  "version": "1.0.0",
+  "description": "env2 营养补估：hy3 AI 估算 dish_mirror 缺营养的菜 → 写 env1 审核池 dish_lexicon_pending（source=env2-nutrition）+ 本地副本",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

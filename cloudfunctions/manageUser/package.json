@@ -1,0 +1,9 @@
+{
+  "name": "manageUser",
+  "version": "1.0.0",
+  "description": "按 openid/userNo 查询用户概况（后台工具）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

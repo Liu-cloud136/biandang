@@ -1,0 +1,9 @@
+{
+  "name": "bypassLogClean",
+  "version": "1.0.0",
+  "description": "env2 bypass_log 保留期清理（3 天）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

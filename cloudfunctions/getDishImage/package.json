@@ -1,0 +1,11 @@
+{
+  "name": "getDishImage",
+  "version": "1.0.0",
+  "description": "为单道菜生成配图（拆分自 getRecommendation 出图步骤，支持前端逐图回传真实进度）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0",
+    "ws": "^8.18.0"
+  }
+}

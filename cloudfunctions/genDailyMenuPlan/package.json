@@ -1,0 +1,11 @@
+{
+  "name": "genDailyMenuPlan",
+  "version": "1.0.0",
+  "description": "每日菜单剧本（阶段2.2）：凌晨按当月时令编排2-3套今日菜单写 daily_menu，白天查表读剧本加分",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0",
+    "ws": "^8.18.0"
+  }
+}

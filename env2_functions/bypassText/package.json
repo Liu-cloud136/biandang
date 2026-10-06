@@ -1,0 +1,10 @@
+{
+  "name": "bypassText",
+  "version": "1.0.0",
+  "description": "env2 非实时文本：hy3 生成 dish_mirror 缺 guide 的菜的简短做法 → 写本地 dish_mirror.guide（env1 回写待 A 模式）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

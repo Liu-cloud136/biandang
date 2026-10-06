@@ -1,0 +1,450 @@
+<!-- 与「我的」等其它页一致：平时整页原生滚动、内容全部显示；仅弹窗时锁底层滚动 -->
+<page-meta page-style="{{ (progress.show || tryLoading || locating || showClaim || showGrantTip || showFeedback || showGuide || showFreeLog || showCook || showFav || showLatencyTip || showNewUserTip || showResultGuide) ? 'overflow: hidden;' : '' }}"></page-meta>
+<wxs module="u">
+function cap8(s) {
+  if (!s) return '';
+  s = s.toString().trim();
+  // 先统计中文字符数：恰好 ≤8 字原样返回（避免「8字…」生硬感）
+  var cn = 0, k;
+  for (k = 0; k < s.length; k++) {
+    var c0 = s.charCodeAt(k);
+    if (c0 >= 19968 && c0 <= 40959) cn++;
+  }
+  if (cn <= 8) return s;
+  // 超过 8 字：截断到 8 个中文字符，去尾部非中文后加省略号
+  var count = 0;
+  var res = '';
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i);
+    var code = s.charCodeAt(i);
+    var isCn = (code >= 19968 && code <= 40959);
+    if (isCn) count++;
+    res += ch;
+    if (count >= 8) {
+      // 去掉尾部非中文字符（标点/空格），避免「…」接在标点后
+      while (res.length > 0) {
+        var lc = res.charCodeAt(res.length - 1);
+        if ((lc < 19968) && (lc !== 8222)) { res = res.substring(0, res.length - 1); } else { break; }
+      }
+      return res + '…';
+    }
+  }
+  return res;
+}
+function cap4(s) {
+  if (!s) return '';
+  s = s.toString().trim();
+  var cn = 0, k;
+  for (k = 0; k < s.length; k++) {
+    var c0 = s.charCodeAt(k);
+    if (c0 >= 19968 && c0 <= 40959) cn++;
+  }
+  if (cn <= 4) return s;
+  var count = 0;
+  var res = '';
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i);
+    var code = s.charCodeAt(i);
+    var isCn = (code >= 19968 && code <= 40959);
+    if (isCn) count++;
+    res += ch;
+    if (count >= 4) {
+      while (res.length > 0) {
+        var lc = res.charCodeAt(res.length - 1);
+        if ((lc < 19968) && (lc !== 8222)) { res = res.substring(0, res.length - 1); } else { break; }
+      }
+      return res + '…';
+    }
+  }
+  return res;
+}
+module.exports = { cap8: cap8, cap4: cap4 };
+</wxs>
+<view class="page">
+
+  <!-- 悬浮工具按钮：左侧公告栏下方，三个图标竖排（仅在未出结果的主页显示，结果页隐藏） -->
+  <view class="fab" wx:if="{{!result}}">
+    <view class="fab-btn" bindtap="goFridge">🧊</view>
+    <view class="fab-btn" bindtap="goWeek">📅</view>
+    <view class="fab-btn" bindtap="goShop">📋</view>
+  </view>
+
+  <view class="top">
+  <!-- 顶部：剩余次数 -->
+  <view class="topbar">
+    <view class="free" bindtap="onShowFreeLog">免费次数：{{freeCount === null ? '加载中…' : freeCount}}</view>
+    <view class="top-actions">
+      <view wx:if="{{!signedToday}}" class="tip sign" bindtap="onSignIn">签到</view>
+      <view wx:else class="tip signed">已签到</view>
+      <view class="tip {{freeClaimed ? 'disabled' : ''}}" bindtap="{{freeClaimed ? 'onClaimExhausted' : 'onGetMore'}}">领次数</view>
+    </view>
+  </view>
+
+  <!-- 通知栏（不可点击、不弹窗、黄色栏内滚动显示全文，持久化） -->
+  <view wx:if="{{announcement}}" class="announce">
+    <text class="announce-icon">📢</text>
+    <view class="announce-text">
+      <text class="announce-marquee">{{announcement.content}}</text>
+    </view>
+  </view>
+
+  <!-- 服务器/定位状态：绿点=正常+已定位；黄点=未定位按节气近似；红点=服务异常。可点击重新定位（仅未出结果的主页显示） -->
+  <!-- 需求1：服务正常（绿点且已定位）不可点击，去掉 hover 并加 disabled 视觉态 -->
+  <view class="server-status {{serverStatus === 'ok' && hasLoc ? 'disabled' : ''}} {{serverStatus === 'down' ? '' : (hasLoc ? '' : 'noloc')}}" wx:if="{{!result}}" bindtap="onStatusTap" hover-class="{{serverStatus === 'ok' && hasLoc ? '' : 'server-status-hover'}}">
+    <view class="status-dot {{serverStatus === 'down' ? 'down' : (hasLoc ? '' : 'noloc')}}"></view>
+    <text class="status-text">{{serverStatus === 'down' ? '服务异常' : (hasLoc ? '服务正常' : '未定位')}}</text>
+  </view>
+
+  </view><!-- /top 固定区：次数栏/公告/状态点 -->
+
+  <!-- 引导态：还没结果，垂直居中于 .top 以下剩余空间 -->
+  <view wx:if="{{!result}}" class="hero-wrap">
+    <view class="hero">
+      <view class="emoji">🍱</view>
+      <view class="q">今天吃什么？</view>
+      <view class="sub">拿不准吃啥？我来帮你拿个主意</view>
+      <view class="btn-primary decide {{loading ? 'loading' : ''}}" bindtap="onDecide">{{loading ? '正在为你安排…' : '帮我决定'}}</view>
+      <view class="guide-entry" bindtap="onShowGuide">使用说明</view>
+    </view>
+  </view>
+
+  <!-- 结果态：推荐详情组件，作为普通块置于悬浮导航(.top)下方，整页原生滚动、内容全部显示 -->
+  <view wx:if="{{result}}" class="result">
+      <block wx:for="{{result.recommendations}}" wx:for-item="group" wx:for-index="gi" wx:key="gi">
+        <view class="scene-title">{{group.scene}}</view>
+        <!-- 伪流式：该场景出文期间由下方进度弹窗(progress.show)承载等待提示，此处不再重复文案 -->
+
+        <block>
+        <view class="block-label" wx:if="{{group.scene !== '小吃'}}">{{group._dishLabel || '菜品'}}</view>
+
+        <view class="dish {{(selected[gi]===ii || item._addedTry) ? 'sel' : ''}}"
+              wx:for="{{group.dishes}}" wx:for-item="item" wx:for-index="ii" wx:key="name"
+              bindtap="onSelectDish" data-gi="{{gi}}" data-ii="{{ii}}">
+          <image wx:if="{{item.imageUrl}}" class="dish-img" src="{{item.imageUrl}}" mode="aspectFill"
+                 binderror="onImageError" data-gi="{{gi}}" data-kind="dishes" data-ci="{{ii}}" data-name="{{item.name}}" />
+          <view wx:else class="dish-img placeholder">🍱</view>
+          <view class="dish-info">
+              <view class="dish-name-row">
+              <text class="dish-name">{{item.name}}</text>
+
+              <text wx:if="{{item._showCook}}" class="cook-btn-inline" catchtap="onCook" data-dish="{{item}}">做法</text>
+            </view>
+            <view class="dish-reason">{{item.reason}}</view>
+          </view>
+          <view class="dish-feedback" catchtap="onOpenFeedback" data-name="{{item.name}}" aria-label="反馈问题菜名">⚠</view>
+        </view>
+
+        <view wx:if="{{group.dishes.length && !group._triedDish}}" class="try-btn" bindtap="onTrySomething" data-gi="{{gi}}" data-kind="dish">想尝试一些其他的？</view>
+
+        <view wx:if="{{group.staples.length}}" class="block-label">{{group._stapleLabel || '饭'}}</view>
+
+        <view class="dish staple {{(selectedStaple[gi]===si || st._addedTry) ? 'sel' : ''}}"
+              wx:for="{{group.staples}}" wx:for-item="st" wx:for-index="si" wx:key="name"
+              bindtap="onSelectStaple" data-gi="{{gi}}" data-si="{{si}}">
+          <image wx:if="{{st.imageUrl}}" class="dish-img" src="{{st.imageUrl}}" mode="aspectFill"
+                 binderror="onImageError" data-gi="{{gi}}" data-kind="staples" data-ci="{{si}}" data-name="{{st.name}}" />
+          <view wx:else class="dish-img placeholder">🍚</view>
+          <view class="dish-info">
+            <view class="dish-name-row">
+              <text class="dish-name">{{st.name}}</text>
+              <text wx:if="{{st._showCook}}" class="cook-btn-inline" catchtap="onCook" data-dish="{{st}}">做法</text>
+            </view>
+            <view class="dish-reason">{{st.reason}}</view>
+          </view>
+          <view class="dish-feedback" catchtap="onOpenFeedback" data-name="{{st.name}}" aria-label="反馈问题">⚠</view>
+        </view>
+
+        <view wx:if="{{group.staples.length && !group._triedStaple}}" class="try-btn" bindtap="onTrySomething" data-gi="{{gi}}" data-kind="staple">想尝试一些其他的？</view>
+
+        </block>
+
+        <view wx:if="{{group.drinks.length}}" class="block-label">饮料</view>
+
+        <view class="dish drink {{(selectedDrink[gi]===di || dk._addedTry) ? 'sel' : ''}}"
+              wx:for="{{group.drinks}}" wx:for-item="dk" wx:for-index="di" wx:key="name"
+              bindtap="onSelectDrink" data-gi="{{gi}}" data-di="{{di}}">
+          <image wx:if="{{dk.imageUrl}}" class="dish-img" src="{{dk.imageUrl}}" mode="aspectFill"
+                 binderror="onImageError" data-gi="{{gi}}" data-kind="drinks" data-ci="{{di}}" data-name="{{dk.name}}" />
+          <view wx:else class="dish-img placeholder">🥤</view>
+          <view class="dish-info">
+            <view class="dish-name-row">
+              <text class="dish-name">{{dk.name}}</text>
+              <text wx:if="{{dk._showCook}}" class="cook-btn-inline" catchtap="onCook" data-dish="{{dk}}">做法</text>
+            </view>
+            <view class="dish-reason">{{dk.reason}}</view>
+          </view>
+          <view class="dish-feedback" catchtap="onOpenFeedback" data-name="{{dk.name}}" aria-label="反馈问题饮料">⚠</view>
+        </view>
+
+        <view wx:if="{{group.drinks.length && !group._triedDrink}}" class="try-btn" bindtap="onTrySomething" data-gi="{{gi}}" data-kind="drink">想尝试一些其他的？</view>
+
+        <view wx:if="{{!group.dishes.length && !group.staples.length && !group.drinks.length}}" class="empty-tip">
+          <text class="empty-tip-text">这个场景暂时没有合适的</text>
+          <view class="btn-ghost" catchtap="onRetryScene" data-gi="{{gi}}">点击重试</view>
+        </view>
+      </block>
+
+      <view class="actions">
+        <view class="btn-primary {{acting ? 'disabled' : ''}}" bindtap="{{acting ? 'noop' : 'onAccept'}}">就它了</view>
+        <view class="btn-ghost {{acting ? 'disabled' : ''}}" bindtap="{{acting ? 'noop' : 'onChangeBatch'}}">换一批</view>
+        <view class="btn-ghost" bindtap="onShare">分享</view>
+      </view>
+
+    </view>
+
+  <!-- 免费次数用完：页面内自绘领取弹层（规避 wx.showModal 被吞） -->
+  <view wx:if="{{showClaim}}" class="claim-mask" catchtap="onClaimCancel" catchtouchmove="noop">
+    <view class="claim-box" catchtap="noop">
+      <view class="claim-title">免费次数用完啦</view>
+      <view class="claim-desc">点击可直接再得 25 次机会</view>
+      <view class="claim-cap">当前免费获取总次数 {{freeCap}} 次（已领取 {{totalFreeGranted}}/{{freeCap}}）</view>
+      <view class="claim-note">{{freeCap}} 次用完后仍需要，请到「我的 → 意见反馈」提交：你的用户 ID + 需要的次数。</view>
+      <view class="claim-actions">
+        <view class="claim-btn cancel" bindtap="onClaimCancel">稍后再说</view>
+        <view class="claim-btn confirm" bindtap="onClaimConfirm">领取 25 次</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 点击「领 3 次」后：当前免费获取提示（广告未开通，让用户知晓） -->
+  <view wx:if="{{showGrantTip}}" class="claim-mask" catchtap="onGrantTipClose" catchtouchmove="noop">
+    <view class="claim-box" catchtap="noop">
+      <view class="claim-title">当前点击即送</view>
+      <view class="claim-desc">目前点击「领次数」直接免费发放 25 次机会。</view>
+      <view class="claim-note">当前每人免费获取总次数 {{freeCap}} 次。因服务器算力有限，为保证更多用户正常体验设此上限；如仍需要，请在「我的 → 意见反馈」提交你的数字 ID 与所需次数，管理员会及时发放。</view>
+      <view class="claim-actions">
+        <view class="claim-btn confirm" bindtap="onGrantTipClose">知道了</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 菜品问题反馈弹层 -->
+  <view wx:if="{{showFeedback}}" class="claim-mask" catchtap="onFeedbackCancel" catchtouchmove="noop">
+    <view class="claim-box" catchtap="noop">
+      <view class="claim-title">问题反馈</view>
+      <view class="claim-desc">「{{feedbackDish}}」哪里不太对？</view>
+      <view class="fb-options">
+        <view class="fb-opt {{feedback.nameIssue === '拼凑' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="拼凑" data-group="nameIssue">
+          <view class="fb-check"></view>
+          <text>名称涉嫌拼凑</text>
+        </view>
+        <view class="fb-opt {{feedback.nameIssue === '搭配不合理' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="搭配不合理" data-group="nameIssue">
+          <view class="fb-check"></view>
+          <text>食材搭配不合理</text>
+        </view>
+        <view class="fb-opt {{feedback.nameIssue === '名字缩略' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="名字缩略" data-group="nameIssue">
+          <view class="fb-check"></view>
+          <text>名字缩略不规范（如猪肉白菜饺→应为猪肉白菜馅饺子）</text>
+        </view>
+        <view class="fb-opt {{feedback.nameIssue === '系统误伤' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="系统误伤" data-group="nameIssue">
+          <view class="fb-check"></view>
+          <text>系统误伤（名称被截断/改错）</text>
+        </view>
+        <view class="fb-divider">— 以下仅个人偏好 —</view>
+        <view class="fb-opt {{feedback.preference === '命中忌口' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="命中忌口" data-group="preference">
+          <view class="fb-check"></view>
+          <text>命中忌口（菜名正常，但我不吃）</text>
+        </view>
+        <view class="fb-opt {{feedback.preference === '不合口味' ? 'on' : ''}}" bindtap="onFeedbackToggle" data-type="不合口味" data-group="preference">
+          <view class="fb-check"></view>
+          <text>不合口味（菜名正常，但我不喜欢）</text>
+        </view>
+      </view>
+      <view class="claim-actions">
+        <view class="claim-btn cancel" bindtap="onFeedbackCancel">取消</view>
+        <view class="claim-btn confirm" bindtap="onFeedbackSubmit">提交反馈</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用说明弹层 -->
+  <view wx:if="{{showGuide}}" class="claim-mask" catchtap="onGuideClose" catchtouchmove="noop">
+    <view class="claim-box guide-box" catchtap="noop">
+      <view class="claim-title">使用说明</view>
+      <scroll-view scroll-y class="guide-scroll">
+        <view class="guide-note">推荐内容仅供参考，请结合自身情况判断，如有饮食禁忌或过敏请谨慎选择。</view>
+        <view class="guide-item {{item.important ? 'guide-important' : ''}}" wx:for="{{guideItems}}" wx:key="h">
+          <text class="guide-h">{{index + 1}}. {{item.h}}</text>{{item.body}}
+        </view>
+      </scroll-view>
+      <view class="claim-actions">
+        <view class="claim-btn confirm" bindtap="onGuideClose">知道了</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 出文耗时说明弹窗（每次冷启动进程首次进首页弹一次） -->
+  <view wx:if="{{showLatencyTip}}" class="claim-mask latency-tip-mask" catchtap="onLatencyTipClose" catchtouchmove="noop">
+    <view class="claim-box latency-tip-box" catchtap="noop">
+      <view class="latency-tip-icon">⏱️</view>
+      <view class="latency-tip-title">请稍等一下下～</view>
+      <view class="latency-tip-desc">要顾全你的口味，容我仔细想一想</view>
+      <view class="latency-tip-points">
+        <view class="latency-tip-point">· 单个场景大约 10 秒内就能给你答复</view>
+        <view class="latency-tip-point">· 高峰期或首次进入会稍慢一些</view>
+      </view>
+      <view class="latency-tip-actions">
+        <view class="latency-tip-btn" bindtap="onLatencyTipClose">我知道了</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新用户引导弹窗（C+A 2026-09-07）：在时间弹窗关闭后弹出；无偏好/注销重注册首刷展示一次，可关闭或直接出菜 -->
+  <view wx:if="{{showNewUserTip}}" class="claim-mask latency-tip-mask" catchtap="closeNewUserTip" catchtouchmove="noop">
+    <view class="claim-box latency-tip-box" catchtap="noop">
+      <view class="latency-tip-icon">🍱</view>
+      <view class="latency-tip-title">想让推荐更合口味？</view>
+      <view class="latency-tip-desc">回答 5 个小问题，之后每次推荐都会更合你的心意。也可以先直接试试，随时都能再补。</view>
+      <view class="nu-actions">
+        <view class="nu-btn primary" bindtap="goQuickGuide">去回答 5 问</view>
+        <view class="nu-btn ghost" bindtap="closeNewUserTip">先随便吃</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 结果引导弹窗（C+A 2026-09-07）：无偏好用户前 5 次出菜后弹出提示可补偏好；
+       点「以后再说」仅跳过本次，前 5 次内下次出菜仍会提醒（答完 5 问或满 5 次后自然不再弹） -->
+  <view wx:if="{{showResultGuide}}" class="claim-mask latency-tip-mask" catchtap="closeResultGuide" catchtouchmove="noop">
+    <view class="claim-box latency-tip-box" catchtap="noop">
+      <view class="latency-tip-icon">✨</view>
+      <view class="latency-tip-title">推荐想更懂你</view>
+      <view class="latency-tip-desc">第一次不太懂你的口味，回答 5 个小问题，之后的推荐会更合心意。</view>
+      <view class="nu-actions">
+        <view class="nu-btn primary" bindtap="goQuickGuide">去回答 5 问</view>
+        <view class="nu-btn ghost" bindtap="closeResultGuide">以后再说</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 免费次数明细弹层：点击「明细」打开，展示从哪加、从哪减 -->
+  <view wx:if="{{showFreeLog}}" class="claim-mask" catchtap="onFreeLogClose" catchtouchmove="noop">
+    <view class="claim-box fl-box" catchtap="noop">
+      <view class="claim-title">免费次数明细</view>
+      <view class="fl-summary">当前可用 {{freeCount === null ? 0 : freeCount}} 次（基础池 {{baseFree}} + 赠送池 {{bonusFree}}）</view>
+      <scroll-view scroll-y class="fl-list">
+        <view wx:if="{{!freeLog.length}}" class="fl-empty">暂无记录，获取或消耗次数后会自动记到这里</view>
+        <view wx:for="{{freeLog}}" wx:key="index" class="fl-item">
+          <view class="fl-info">
+            <view class="fl-name">{{item.sourceName}}</view>
+          </view>
+          <view class="fl-right">
+            <view class="fl-amt {{item.type === 'add' ? 'plus' : 'minus'}}">{{item.type === 'add' ? '+' : '-'}}{{item.amount}}</view>
+            <view class="fl-time">{{item.ts}}</view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="claim-actions">
+        <view class="claim-btn confirm" bindtap="onFreeLogClose">知道了</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 决定中：真实计数连续进度（方案 A，出文与出图并行，统一用一条真实进度反映） -->
+  <view wx:if="{{progress.show}}" class="prog-mask" catchtap="noop" catchtouchmove="noop">
+    <view class="prog-box" catchtap="noop">
+      <view class="prog-emoji prog-emoji--swing">🤔</view>
+      <view class="prog-title">{{progress.isChangeBatch ? '换一批中…' : '正在为你决定…'}}</view>
+      <view class="prog-sub">正在搭配菜品，请稍候…</view>
+      <view class="prog-bar {{progress.indeterminate ? 'prog-bar--indet' : ''}}">
+        <view class="prog-fill" style="width: {{progress.pct}}%;"></view>
+      </view>
+      <view class="prog-count">
+        <view wx:if="{{progress.indeterminate}}" class="prog-story">
+          <text class="prog-story-emoji s0">🤔</text>
+          <text class="prog-story-emoji s1">🤔🍳</text>
+          <text class="prog-story-emoji s2">🍳</text>
+          <text class="prog-story-emoji s3">🍲</text>
+        </view>
+        <block wx:else>{{progress.countText}}</block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 尝鲜「想尝试一些其他的？」加载：自绘进度条 + 轮播标语（替代系统 wx.showLoading） -->
+  <view wx:if="{{tryLoading}}" class="try-mask" catchtap="noop" catchtouchmove="noop">
+    <view class="try-box" catchtap="noop">
+      <view class="try-spin"></view>
+      <view class="try-title">正在为你换一道…</view>
+      <view class="try-slogan">{{trySlogan}}</view>
+      <view class="try-bar">
+        <view class="try-fill" style="width: {{tryProgress}}%;"></view>
+      </view>
+      <view class="try-pct">{{tryProgress}}%</view>
+    </view>
+  </view>
+
+  <!-- 定位中：点击状态条「未定位」后弹出，给即时反馈（原无加载态、像卡住）。复用 try-spin 旋转动画 -->
+  <view wx:if="{{locating}}" class="try-mask" catchtap="noop" catchtouchmove="noop">
+    <view class="try-box" catchtap="noop">
+      <view class="try-spin"></view>
+      <view class="try-title">定位中…</view>
+      <view class="try-slogan">正在获取你所在城市的天气</view>
+    </view>
+  </view>
+
+  <!-- 分享卡片封面：隐藏 canvas，用于菜品缩略图宫格拼接 -->
+  <canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>
+
+  <!-- 做法弹窗（复用历史详情页样式） -->
+  <view wx:if="{{showCook}}" class="cook-mask" bindtap="closeCook" catchtouchmove="noop">
+    <view class="cook-box" catchtap="noop">
+      <view class="cook-head">
+        <view class="cook-title">{{guideDish}} · 做法</view>
+        <view class="fav-btn {{cookFav ? 'on' : ''}} {{guideLoading ? 'disabled' : ''}}" catchtap="onOpenCookFav">{{cookFav ? '★' : '☆'}}</view>
+        <text class="fav-count" wx:if="{{cookFavCount != null && cookFavCount > 0}}">{{cookFavCount}}</text>
+      </view>
+      <view wx:if="{{cookGuide && cookGuide.difficulty}}" class="cook-meta-center">
+        <text class="cook-tag diff">难度 · {{cookGuide.difficulty}}</text>
+      </view>
+      <view wx:if="{{guideLoading}}" class="cook-loading">准备中…</view>
+      <scroll-view wx:else scroll-y class="cook-scroll">
+        <view class="cook-sec">所需食材</view>
+        <view wx:if="{{cookGuide.ingMain && cookGuide.ingMain.length}}">
+          <view wx:for="{{cookGuide.ingMain}}" wx:for-item="ing" wx:key="*this" class="cook-li">· {{ing}}</view>
+        </view>
+        <view wx:if="{{cookGuide.seasonLine}}" class="cook-season">调料：{{cookGuide.seasonLine}}</view>
+        <view wx:if="{{!(cookGuide.ingMain && cookGuide.ingMain.length) && !cookGuide.seasonLine}}" class="cook-empty">暂无食材信息</view>
+        <view class="cook-sec">烹饪步骤</view>
+        <view wx:for="{{cookGuide.steps}}" wx:for-item="st" wx:for-index="si2" wx:key="index" class="cook-li">{{si2 + 1}}. {{st}}</view>
+        <view wx:if="{{!cookGuide.steps.length}}" class="cook-empty">暂无步骤信息</view>
+        <block wx:if="{{cookGuide.tips}}">
+          <view class="cook-sec">小贴士</view>
+          <view class="cook-review">{{cookGuide.tips}}</view>
+        </block>
+        <view class="cook-sec">点评</view>
+        <view wx:if="{{cookGuide.review}}" class="cook-review">{{cookGuide.review}}</view>
+        <view wx:else class="cook-empty">暂无点评</view>
+        <view class="cook-report" catchtap="onReportDish" data-name="{{guideDish}}">不喜欢 / 觉得有问题？反馈一下</view>
+      </scroll-view>
+      <view class="cook-close-btn {{guideLoading ? 'disabled' : ''}}" bindtap="closeCook">关闭</view>
+    </view>
+  </view>
+
+  <!-- 收藏选择弹层（复用历史详情页模式） -->
+  <view wx:if="{{showFav}}" class="fav-mask" bindtap="onCloseFav" catchtouchmove="noop">
+    <view class="fav-box" catchtap="noop">
+      <view class="fav-opt" bindtap="onFavLocal">
+        <view class="fav-opt-main">{{favLocal ? '取消本地收藏' : '收藏到本地'}}</view>
+        <view class="fav-opt-desc">{{favLocal ? '已在本机保留' : '即时保存，仅本机'}}</view>
+      </view>
+      <view class="fav-opt cloud" bindtap="onFavCloud">
+        <view class="fav-opt-main">{{favCloud ? '取消云端收藏' : '收藏到云端'}}<text class="fav-opt-tag cost" wx:if="{{!favCloud}}">耗 1 次</text></view>
+        <view class="fav-opt-desc">{{favCloud ? '已跨设备同步' : '跨设备保留，消耗免费次数'}}</view>
+      </view>
+      <view class="fav-cancel" bindtap="onCloseFav">取消</view>
+    </view>
+  </view>
+
+  <!-- 反馈补充说明（阶段5② 自定义大输入框，替代系统 editable 弹窗） -->
+  <view wx:if="{{rep.show}}" class="rep-mask" bindtap="onRepNoteCancel" catchtouchmove="noop">
+    <view class="rep-box" catchtap="noop">
+      <view class="rep-title">补充说明（选填）</view>
+      <textarea class="rep-text" value="{{rep.text}}" bindinput="onRepNoteInput" maxlength="200"
+        placeholder="例如：盐太多 / 搭配奇怪 / 步骤不对（最多 200 字）" placeholder-class="rep-ph" cursor-spacing="12"></textarea>
+      <view class="rep-actions">
+        <view class="rep-btn cancel" catchtap="onRepNoteCancel">取消</view>
+        <view class="rep-btn ok" catchtap="onRepNoteSubmit">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

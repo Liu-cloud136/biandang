@@ -1,0 +1,372 @@
+<wxs module="fmt">
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function fmtTime(s) {
+  if (!s) return '';
+  var d = getDate(s);
+  if (!d || isNaN(d.getTime())) return s;
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+module.exports = { fmtTime: fmtTime };
+</wxs>
+<page-meta page-style="{{ (showFeedback || showBackups || showLogout || showContribInfo || showContribForm || showAvoid || showTry || showContribResult || showRedeem) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <view class="header">
+    <view class="avatar-wrap">
+      <view class="avatar {{showHalo ? 'avatar-halo' : ''}}" bindtap="onAvatarTap">🍱</view>
+    </view>
+    <view class="title">今天吃什么？</view>
+    <view class="sub">越用越懂你的美食助手</view>
+  </view>
+
+  <!-- 今日统计 -->
+  <view class="stats">
+    <view class="stat fav" bindtap="goFavorites">
+      <view class="num">{{favCount}}</view>
+      <view class="lab">收藏</view>
+    </view>
+    <view class="stat">
+      <view class="num">{{hasUserId ? (userId === 'admin' ? '管理员' : userId) : (userIdLoading ? '加载中…' : (userIdGuest ? '未登录' : '—'))}}</view>
+      <view class="lab">用户ID</view>
+    </view>
+    <view class="stat feedback" bindtap="onFeedback">
+      <view class="num">✏️</view>
+      <view class="lab">反馈</view>
+    </view>
+    <view class="stat redeem" bindtap="onOpenRedeem">
+      <view class="num">🎟️</view>
+      <view class="lab">兑换码</view>
+    </view>
+  </view>
+
+  <!-- 未登录诊断（OPENID 未获取到时显示真实原因，供排查；可手动重试） -->
+  <view class="block" wx:if="{{userIdGuest}}">
+    <view class="block-title">未登录</view>
+    <view class="row"><text class="v">未获取到微信身份（OPENID），无法显示用户ID与管理入口。</text></view>
+    <view class="row"><text class="v err">{{userIdErr}}</text></view>
+    <view class="contrib-btn" bindtap="retryLoad">重试获取</view>
+  </view>
+
+  <!-- 次数中心：免费次数用尽后可购买次数包（Android） -->
+  <view class="block pay-enter">
+    <view class="block-title">次数中心</view>
+    <view class="contrib-tip">免费次数用尽后可购买次数包，畅享每日搭配、周菜单、冰箱活用等全部功能</view>
+    <view class="contrib-btn" bindtap="goPayCenter">进入次数中心</view>
+  </view>
+
+  <!-- 管理后台入口（仅管理员可见；由云端 amIAdmin 校验，每次进入实时判定） -->
+  <view class="block admin-enter" wx:if="{{isAdmin}}">
+    <view class="block-title">管理后台</view>
+    <view class="contrib-tip">发放次数、黑名单、反馈与贡献审核、公告、注销用户</view>
+    <view class="contrib-btn" bindtap="goAdmin">进入管理后台</view>
+  </view>
+
+  <!-- 偏好：每项都展示（含未设置），均可单独点击进入 setup 对应步骤单独编辑并保存 -->
+  <view class="block">
+    <view class="block-title">我的饮食偏好</view>
+    <view class="row pref-row" wx:for="{{prefFields}}" wx:key="field" bindtap="onPrefItemTap" data-field="{{item.field}}">
+      <text class="k">{{item.k}}</text>
+      <text class="v {{item.empty ? 'v-empty' : ''}}">{{item.v}}</text>
+      <text class="pref-edit-ico">›</text>
+    </view>
+    <view class="row empty empty-state" wx:if="{{allEmpty}}">
+      <text class="v">还没有设置任何饮食偏好，点下方按钮从头添加。</text>
+    </view>
+    <view class="pref-note" wx:if="{{!allEmpty}}">以上各项偏好均可单独点击进入，未设置的项点进去即可添加。</view>
+    <view class="pref-setup-btn" wx:if="{{allEmpty}}" bindtap="goFirstSetup">设置饮食偏好</view>
+  </view>
+
+  <!-- 推荐参数调整：独立页面 pages/tuning -->
+  <view class="contrib-btn tuning-enter" wx:if="{{tuning}}" bindtap="goTuning">推荐参数调整</view>
+
+  <!-- 购菜清单：冰箱反推 / 剩菜改造 / 历史详情「加入购菜清单」导入的食材采购清单 -->
+  <view class="block shop-enter">
+    <view class="block-title">购菜清单</view>
+    <view class="contrib-tip">「加入购菜清单」会汇入这里，买菜时打勾核对，可随时增删、清空。</view>
+    <view class="contrib-btn" bindtap="goShop">查看购菜清单</view>
+  </view>
+
+  <!-- 周期性洞察（2026-08-05）：我的口味周报，基于近期「就它了」统计，作为回访动机。零扣次。 -->
+  <view class="block insight-enter" wx:if="{{insight}}">
+    <view class="block-title">我的口味周报 <text class="insight-sub">近 {{insight.days}} 天</text></view>
+    <block wx:if="{{insight.empty}}">
+      <view class="contrib-tip empty-state">最近还没做过决定，点首页「帮我决定」并选「就它了」，就能看到你的口味画像啦。</view>
+    </block>
+    <block wx:else>
+      <view class="insight-row"><text class="insight-k">做了决定</text><text class="insight-v">{{insight.decidedCount}} 次</text></view>
+      <view class="insight-row" wx:if="{{insight.meatTop.length}}">
+        <text class="insight-k">常吃</text>
+        <text class="insight-v">{{insight.meatTop[0].label}}<text wx:if="{{insight.meatTop[1]}}">、{{insight.meatTop[1].label}}</text></text>
+      </view>
+      <view class="insight-row" wx:if="{{insight.repeated.length}}">
+        <text class="insight-k">最近常点</text>
+        <text class="insight-v">{{insight.repeated[0]}}<text wx:if="{{insight.repeated[1]}}">、{{insight.repeated[1]}}</text></text>
+      </view>
+      <view class="insight-row" wx:if="{{insight.suggested.length}}">
+        <text class="insight-k">可以试试</text>
+        <text class="insight-v">{{insight.suggested[0]}}<text wx:if="{{insight.suggested[1]}}">、{{insight.suggested[1]}}</text></text>
+      </view>
+    </block>
+  </view>
+
+  <!-- 全局算法理解总览（2026-08-06）：展示算法对你的整体理解——肉类/菜类权重强度、探索方向、降档方向。零扣次。 -->
+  <!-- 注意：始终渲染外层，避免云函数调用失败/本地环境无数据时整块消失（之前"连提示都没有"的根因） -->
+  <view class="block wo-enter wo-card {{weightOverview.locked ? 'wo-card--locked' : ''}}">
+    <view class="wo-card-head">
+      <view class="wo-card-bar"></view>
+      <view class="block-title wo-card-title">算法眼里的你</view>
+    </view>
+    <!-- 加载失败 / 无数据（始终给出可读提示，不再整块消失） -->
+    <view wx:if="{{!weightOverview}}" class="contrib-tip">暂时无法获取你的口味理解。</view>
+    <!-- 已拿到数据 -->
+    <block wx:else>
+    <block wx:if="{{weightOverview.empty}}">
+      <view class="contrib-tip empty-state">最近还没做过决定，多点点「就它了」，算法就能逐渐理解你的口味啦。</view>
+    </block>
+    <!-- 2026-08-07 锁定态：盖子与模糊层已抽到 wo-card 末尾（覆盖整个组件），此处不再渲染 -->
+    <block wx:elif="{{weightOverview.locked}}">
+    </block>
+    <block wx:else>
+      <!-- 口味人格：按维度分色的标签胶囊（core 人格 / flavor 口味 / trend 趋势） -->
+      <view class="wo-persona" wx:if="{{personaTags.length}}">
+        <view class="persona-cloud">
+          <text
+            wx:for="{{personaTags}}"
+            wx:key="text"
+            class="persona-chip dim-{{item.dim}}">{{item.text}}</text>
+        </view>
+      </view>
+      <view class="contrib-tip empty-state" wx:else>你与大家口味接近，暂无特别突出的方向。</view>
+    </block>
+    </block>
+    <!-- 玻璃拟态模糊底层：锁定时覆盖在内容之上，营造"封印中"质感 -->
+    <view class="wo-seal-glass" style="{{weightOverview.locked ? '' : 'display:none'}}"></view>
+    <!-- 锁定态磨砂盖 -->
+    <view class="wo-seal" style="{{weightOverview.locked ? '' : 'display:none'}}">
+      <view class="wo-seal-title">口味画像待解锁</view>
+      <view class="wo-seal-sub">用得越多越懂你</view>
+      <view class="wo-seal-prog">
+        <view class="wo-seal-row">
+          <text class="wo-seal-lab">解锁进度</text>
+          <text class="wo-seal-val">{{weightOverview.overallPct}}%</text>
+        </view>
+        <view class="wo-seal-bar"><view class="wo-seal-fill" style="width:{{weightOverview.overallPct}}%"></view></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 所在城市：用于真实天气推荐（IP 定位，无授权弹窗） -->
+  <view class="block">
+    <view class="block-title">所在城市</view>
+    <view class="contrib-tip">用于按你当地实时天气推荐（炎热推凉菜、雨天推汤）。点「定位」自动获取，基于 IP 定位。</view>
+    <view class="loc-row">
+      <text class="loc-cur">当前：{{locText || '未设置'}}</text>
+      <view class="loc-actions">
+        <view class="contrib-btn slim" bindtap="onLocate">定位</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我不喜欢的菜：个人忌口反馈记录，仅本人可见，AI 不再推荐 -->
+  <view class="block avoid-enter">
+    <view class="block-title">我不喜欢的菜</view>
+    <view class="contrib-tip">你反馈「命中忌口 / 不合口味」的菜会记在这里，之后将不再为你搭配；最多保留最近 50 条（超出自动丢弃最早的），可随时删除。</view>
+    <view class="contrib-btn" bindtap="onManageAvoid">管理不喜欢的菜</view>
+  </view>
+
+  <!-- 贡献菜名/食材：位于偏好与不喜欢菜下方 -->
+  <view class="block contrib-enter">
+    <view class="block-title">贡献菜名 / 食材</view>
+    <view class="contrib-tip">提交你喜欢的菜名或食材，审核通过自动发放免费次数</view>
+    <view class="contrib-btn" bindtap="onContribOpen">贡献菜名或食材</view>
+  </view>
+
+  <!-- 我的尝鲜清单：首页「想尝试一些其他的？」加入偏好的菜，可管理 -->
+  <view class="block try-enter">
+    <view class="block-title">我的尝鲜清单</view>
+    <view class="contrib-tip">在首页点「想尝试一些其他的？」并加入偏好的菜会记在这里，可随时删除。</view>
+    <view class="contrib-btn" bindtap="onManageTry">管理尝鲜清单</view>
+  </view>
+
+  <view class="backup-row">
+    <view class="btn-ghost backup-btn" bindtap="onBackup">备份数据（耗 1 次）</view>
+    <view class="btn-ghost restore-btn" bindtap="onManageBackups">备份管理</view>
+  </view>
+
+  <view class="btn-ghost clearcache" bindtap="onClearCache">清理缓存</view>
+
+  <view class="btn-ghost logout" wx:if="{{!isAdmin}}" bindtap="onLogout">注销账户</view>
+
+  <!-- 注销确认弹层 -->
+  <view wx:if="{{showLogout}}" class="fb-mask" catchtap="onLogoutCancel" catchtouchmove="noop">
+    <view class="fb-box" catchtap="noop">
+      <view class="fb-title">注销账户</view>
+      <view class="fb-desc">将删除你的全部偏好、历史与统计记录，并清除对你口味的选择记忆，<text class="red-bold">云端备份</text>也会清空，且不可恢复。确定继续？</view>
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onLogoutCancel">取消</view>
+        <view class="fb-btn confirm" bindtap="onLogoutConfirm">确认注销</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 意见反馈：自绘弹层（大输入框） -->
+  <view wx:if="{{showFeedback}}" class="fb-mask" catchtap="onFeedbackCancel" catchtouchmove="noop">
+    <view class="fb-box" catchtap="noop">
+      <view class="fb-title">意见反馈</view>
+      <textarea
+        class="fb-input"
+        placeholder="免费次数用完后，请在此填写：你的用户ID + 需要的次数；其它建议也可留言…"
+        placeholder-class="fb-ph"
+        value="{{feedbackText}}"
+        bindinput="onFeedbackInput"
+        maxlength="500"
+        auto-focus
+      />
+      <view class="fb-count">{{feedbackText.length}}/500</view>
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onFeedbackCancel">取消</view>
+        <view class="fb-btn confirm" bindtap="onFeedbackSubmit">提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备份管理：自绘弹窗，显示备份记录，可删除/恢复每条 -->
+  <view wx:if="{{showBackups}}" class="fb-mask" catchtap="onBackupsClose" catchtouchmove="noop">
+    <view class="bk-box" catchtap="noop">
+      <view class="bk-title">备份管理</view>
+      <scroll-view scroll-y class="bk-list" wx:if="{{backupList.length}}">
+        <view class="bk-item" wx:for="{{backupList}}" wx:key="id">
+          <view class="bk-info" bindtap="onRestoreBackup" data-id="{{item.id}}" data-label="{{item.desc}}">
+            <view class="bk-label">{{fmt.fmtTime(item.createdAt)}}</view>
+            <view class="bk-sub">含 {{item.size}} 条记录 · 点击恢复</view>
+          </view>
+          <view class="bk-del" catchtap="onDeleteBackup" data-id="{{item.id}}">删除</view>
+        </view>
+      </scroll-view>
+      <view class="bk-empty empty-state" wx:else>还没有备份记录</view>
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onBackupsClose">关闭</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 贡献说明弹窗（第一步：提示） -->
+  <view wx:if="{{showContribInfo}}" class="fb-mask" catchtap="onContribInfoCancel" catchtouchmove="noop">
+    <view class="fb-box" catchtap="noop">
+      <view class="fb-title">贡献菜名 / 食材</view>
+      <view class="fb-desc">提交菜名、食材经核对与库内无重复以及非刻意编造后，自动发放次数，菜名每个2次，食材每个一次。</view>
+      <view class="fb-actions">
+        <view class="fb-btn confirm" data-type="dish" bindtap="onContribInfoOk">贡献菜品</view>
+        <view class="fb-btn confirm" data-type="ingredient" bindtap="onContribInfoOk">贡献食材</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 贡献填写弹窗（第二步：按所选类型独立填写） -->
+  <view wx:if="{{showContribForm}}" class="fb-mask" catchtap="onContribCancel" catchtouchmove="noop">
+    <view class="fb-box contrib-form" catchtap="noop">
+      <view class="fb-title">{{contribType === 'ingredient' ? '贡献食材' : '贡献菜品'}}</view>
+
+      <scroll-view scroll-y class="contrib-scroll">
+        <block wx:if="{{contribType !== 'ingredient'}}">
+          <view class="contrib-label">菜名（每行一个，可填多个）</view>
+          <textarea class="fb-input contrib-ta" placeholder="例如：番茄炒蛋" placeholder-class="fb-ph" value="{{contribDishes}}" bindinput="onContribDishInput" maxlength="600" auto-focus />
+        </block>
+
+        <block wx:else>
+          <view class="contrib-note">推荐一次上传同一类（同一种类）的食材，便于偏好里按类筛选与展示。</view>
+          <view class="contrib-label">食材（每行一个，可填多个）</view>
+          <textarea class="fb-input contrib-ta" placeholder="例如：西红柿" placeholder-class="fb-ph" value="{{contribIngredients}}" bindinput="onContribIngInput" maxlength="600" auto-focus />
+          <view class="contrib-label req">食材分类（必选，本批食材共用，便于偏好里按类筛选）</view>
+          <view class="cat-grid">
+            <view wx:for="{{ING_CATEGORIES}}" wx:key="*this"
+                  class="cat-chip {{contribIngCategory === item ? 'on' : ''}}"
+                  bindtap="onContribIngCat" data-cat="{{item}}">{{item}}</view>
+          </view>
+        </block>
+      </scroll-view>
+
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onContribCancel">取消</view>
+        <view class="fb-btn confirm" bindtap="onSubmitContrib">提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 贡献提交结果：自绘弹窗，显示每条通过/未通过及 AI 审核原因 -->
+  <view wx:if="{{showContribResult}}" class="fb-mask" catchtap="onContribResultClose" catchtouchmove="noop">
+    <view class="cr-box" catchtap="noop">
+      <view class="cr-title">提交结果</view>
+      <scroll-view scroll-y class="cr-list">
+        <view class="cr-item" wx:for="{{contribResult}}" wx:key="index">
+          <view class="cr-head">
+            <text class="cr-name">{{item.value}}</text>
+            <text class="cr-tag {{item.status}}">{{item.status === 'valid' ? '通过' : (item.status === 'pending' ? '待审核' : '未通过')}}</text>
+          </view>
+          <view class="cr-reason" wx:if="{{item.reason}}">{{item.reason}}</view>
+        </view>
+      </scroll-view>
+      <view class="fb-actions">
+        <view class="fb-btn confirm" bindtap="onContribResultClose">我知道了</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我不喜欢的菜管理：自绘弹窗，列出记录，可删除 -->
+  <view wx:if="{{showAvoid}}" class="fb-mask" catchtap="onAvoidClose" catchtouchmove="noop">
+    <view class="bk-box" catchtap="noop">
+      <view class="bk-title">我不喜欢的菜</view>
+      <view class="bk-list" wx:if="{{avoidList.length}}">
+        <view class="bk-item" wx:for="{{avoidList}}" wx:key="*this">
+          <view class="bk-info"><view class="bk-label">{{item}}</view></view>
+          <view class="bk-del" catchtap="onRemoveAvoid" data-dish="{{item}}">删除</view>
+        </view>
+      </view>
+      <view class="bk-empty empty-state" wx:else>还没有不喜欢的菜</view>
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onAvoidClose">关闭</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的尝鲜清单管理：自绘弹窗，列出记录，可删除 -->
+  <view wx:if="{{showTry}}" class="fb-mask" catchtap="onTryClose" catchtouchmove="noop">
+    <view class="bk-box" catchtap="noop">
+      <view class="bk-title">我的尝鲜清单</view>
+      <view class="bk-list" wx:if="{{tryList.length}}">
+        <view class="bk-item" wx:for="{{tryList}}" wx:key="*this">
+          <view class="bk-info"><view class="bk-label">{{item}}</view></view>
+          <view class="bk-del" catchtap="onRemoveTry" data-name="{{item}}">删除</view>
+        </view>
+      </view>
+      <view class="bk-empty empty-state" wx:else>还没有加入的尝鲜菜</view>
+      <view class="fb-actions">
+        <view class="fb-btn cancel" bindtap="onTryClose">关闭</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showRedeem}}" class="fb-mask" catchtap="onRedeemClose" catchtouchmove="noop">
+    <view class="fb-box" catchtap="noop">
+      <view class="fb-title">兑换码</view>
+      <view class="rd-row">
+        <input
+          class="rd-input"
+          placeholder="请输入兑换码（区分大小写）"
+          placeholder-class="fb-ph"
+          value="{{redeemCode}}"
+          bindinput="onRedeemInput"
+          maxlength="40"
+          auto-focus
+        />
+        <view wx:if="{{redeemValid === true}}" class="rd-valid ok">✓</view>
+        <view wx:elif="{{redeemValid === false}}" class="rd-valid no">✗</view>
+      </view>
+      <view class="rd-msg {{redeemMsgType}}" wx:if="{{redeemMsg}}">{{redeemMsg}}</view>
+      <view class="fb-actions">
+        <view class="btn-ghost fb-btn" bindtap="onRedeemClose">取消</view>
+        <view class="btn-primary fb-btn" bindtap="onRedeemSubmit">兑换</view>
+      </view>
+    </view>
+  </view>
+
+</view>

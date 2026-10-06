@@ -1,0 +1,139 @@
+.page { padding: 32rpx 32rpx calc(240rpx + env(safe-area-inset-bottom)) 32rpx; }
+
+.tip {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 80rpx 40rpx;
+  line-height: 1.7;
+}
+
+.offline-bar {
+  background: #fff7e6;
+  color: #ad6800;
+  font-size: 24rpx;
+  text-align: center;
+  padding: 14rpx 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.fav-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 18rpx 16rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.04);
+}
+.fimg {
+  width: 120rpx; height: 120rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  background: #FFE6D5;
+}
+.fimg.ph {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56rpx;
+}
+.finfo { flex: 1; min-width: 0; }
+.fname {
+  font-size: 32rpx; font-weight: 700; color: #333;
+  margin-bottom: 12rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ftags { display: flex; flex-wrap: wrap; gap: 10rpx; }
+.ftag {
+  font-size: 22rpx;
+  color: #B87325;
+  background: #FFF1E4;
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
+}
+.ftag.cloud { color: #2B7CE8; background: #E8F1FE; }
+.ftag.local { color: #2BA471; background: #E6F6EE; }
+.fremove {
+  width: 56rpx; height: 56rpx;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #bbb; font-size: 32rpx;
+  border-radius: 50%;
+}
+.fremove:active { background: #F2F3F5; color: #E8533E; }
+.fgo {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: #FF8C42;
+  margin-left: 8rpx;
+}
+
+/* 做法弹层（点收藏项直接查看） */
+.guide-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 48rpx;
+}
+.guide-box {
+  width: 100%; max-width: 600rpx;
+  max-height: 78vh;
+  background: #fff; border-radius: 24rpx;
+  padding: 32rpx 32rpx 20rpx; box-sizing: border-box;
+  display: flex; flex-direction: column;
+}
+.guide-title {
+  font-size: 32rpx; font-weight: 700; color: #333;
+  text-align: center; margin-bottom: 20rpx;
+}
+.fav-count-row {
+  display: flex; justify-content: center; align-items: center;
+  flex-wrap: wrap; gap: 16rpx; margin-top: 6rpx; margin-bottom: 14rpx;
+}
+.fav-count-row .fav-count {
+  display: inline-block;
+  font-size: 22rpx; color: #999; font-weight: 400;
+  padding: 2rpx 12rpx;
+  border: 1rpx solid #ddd; border-radius: 999rpx;
+}
+.guide-diff-center {
+  text-align: center;
+  margin-bottom: 14rpx;
+}
+.guide-scroll { flex: 1; max-height: 56vh; }
+.guide-loading { text-align: center; color: #999; font-size: 28rpx; padding: 60rpx 0; }
+.guide-meta { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: 4rpx; }
+.guide-tag {
+  font-size: 24rpx; color: #FF8C42;
+  background: #FFF3E8; border-radius: 24rpx;
+  padding: 6rpx 18rpx; line-height: 1.4;
+}
+.guide-tag.diff { background: #FFE7CF; font-weight: 700; }
+.guide-sec {
+  font-size: 28rpx; font-weight: 700; color: #FF8C42;
+  margin: 24rpx 0 12rpx;
+}
+.guide-sec:first-child { margin-top: 0; }
+.guide-li { font-size: 28rpx; color: #444; line-height: 1.8; }
+.guide-season { font-size: 26rpx; color: #8a8a8a; line-height: 1.8; margin: 4rpx 0 12rpx; word-break: break-all; }
+.guide-report { font-size: 24rpx; color: #b0a89a; text-align: center; margin: 20rpx 0 6rpx; text-decoration: underline; }
+.rep-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 400; }
+.rep-box { width: 84%; background: #fff; border-radius: 20rpx; padding: 30rpx 28rpx 24rpx; box-sizing: border-box; }
+.rep-title { font-size: 30rpx; font-weight: 700; color: #333; margin-bottom: 20rpx; }
+.rep-text { width: 100%; height: 220rpx; box-sizing: border-box; border: 2rpx solid #eee; border-radius: 12rpx; padding: 16rpx; font-size: 28rpx; line-height: 1.5; color: #444; background: #fafafa; }
+.rep-ph { color: #bbb; }
+.rep-actions { display: flex; margin-top: 24rpx; }
+.rep-btn { flex: 1; text-align: center; font-size: 30rpx; padding: 18rpx 0; border-radius: 30rpx; }
+.rep-btn.cancel { color: #666; background: #f2f2f2; margin-right: 16rpx; }
+.rep-btn.ok { color: #fff; background: #FF8C42; font-weight: 700; }
+.guide-empty { font-size: 26rpx; color: #bbb; text-align: center; padding: 40rpx 0; }
+.guide-review {
+  font-size: 28rpx; color: #7a5230;
+  background: #FFF7Ef; border-radius: 12rpx; padding: 16rpx 20rpx; line-height: 1.7;
+}
+.guide-close {
+  text-align: center; color: #fff; background: #FF8C42;
+  border-radius: 999rpx; padding: 18rpx 0; margin-top: 20rpx; font-size: 30rpx;
+}
+.guide-close.disabled { background: #CCC; color: #fff; pointer-events: none; }

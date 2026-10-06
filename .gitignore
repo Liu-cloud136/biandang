@@ -1,0 +1,58 @@
+# ============================================================
+#  「诶呀妈呀 今天吃啥呀」 — 公开仓库 .gitignore
+# ============================================================
+
+# ===== 密钥 / 环境配置（严禁入库）=====
+.env
+.env.*
+!.env.example
+*.local
+*.pem
+*.key
+id_ed25519*
+.*-capability.json
+
+# ===== 依赖（云端/本地安装，不入库）=====
+node_modules/
+**/node_modules/
+miniprogram_npm/
+
+# ===== 微信开发者工具本地私有配置 =====
+project.private.config.json
+
+# ===== 构建 / 缓存产物 =====
+dist/
+build/
+.cache/
+*.log
+npm-debug.log*
+yarn-error.log*
+*.map
+.DS_Store
+Thumbs.db
+
+# ===== 编辑器 / IDE =====
+.vscode/
+.idea/
+*.swp
+
+# ===== 临时脚本 / 一次性探针 =====
+_tmp_*
+*.tmp
+*.bak
+*.bak_corrupt
+*.pre_*
+*.orig
+
+# ===== 打包 / 部署产物 =====
+*.tar.gz
+*.zip
+
+# ===== 本地迁移 / 备份 / 素材（非代码）=====
+备份/
+旧内容/
+参赛材料/
+宣传物料/
+promo/
+entry_materials/
+.cowork-temp/

@@ -1,0 +1,9 @@
+{
+  "name": "virtualPayNotify",
+  "version": "1.0.0",
+  "description": "虚拟支付发货通知（HTTP 访问服务）：验单+幂等发货 bonusFree/free_log",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

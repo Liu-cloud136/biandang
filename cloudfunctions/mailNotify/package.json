@@ -1,0 +1,10 @@
+{
+  "name": "mailNotify",
+  "version": "1.0.0",
+  "description": "QQ 邮箱 SMTP 通知",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "nodemailer": "^6.9.0"
+  }
+}

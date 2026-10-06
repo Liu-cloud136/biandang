@@ -1,0 +1,9 @@
+{
+  "name": "syncImagesFromEnv2",
+  "version": "1.0.0",
+  "description": "临时函数：批量同步 env2 新图片到 env1 已入库的菜",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "getPrefs",
+  "version": "1.0.0",
+  "description": "读取当前用户饮食偏好",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,63 @@
+<page-meta page-style="{{ showGuide ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <view wx:if="{{offline}}" class="offline-bar">📡 当前无网络，展示本地收藏（恢复网络后自动刷新）</view>
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+  <view wx:elif="{{list.length === 0}}" class="tip">还没有收藏。在看做法里点右上角 ☆ 即可收藏～</view>
+  <view wx:else>
+    <view class="fav-item" wx:for="{{list}}" wx:key="dish" bindtap="onOpenGuide" data-dish="{{item.dish}}">
+      <image wx:if="{{item.imageUrl}}" class="fimg" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view wx:else class="fimg ph">🍱</view>
+      <view class="finfo">
+        <view class="fname">{{item.dish}}</view>
+        <view class="ftag {{item.from === 'cloud' ? 'cloud' : 'local'}}">{{item.from === 'cloud' ? '云端' : '本地'}}</view>
+      </view>
+      <view class="fgo">看做法</view>
+      <view class="fremove" catchtap="onRemove" data-dish="{{item.dish}}" data-synced="{{item.synced}}">✕</view>
+    </view>
+  </view>
+
+  <!-- 做法弹层：点收藏项直接看做法 -->
+  <view wx:if="{{showGuide}}" class="guide-mask" bindtap="onCloseGuide" catchtouchmove="noop">
+    <view class="guide-box" catchtap="noop">
+      <view class="guide-title">{{guide.name}} · 做法</view>
+      <view class="fav-count-row" wx:if="{{(favCount != null && favCount > 0) || guide.difficulty}}">
+        <text class="guide-tag diff" wx:if="{{guide.difficulty}}">难度 · {{guide.difficulty}}</text>
+        <text class="fav-count" wx:if="{{favCount != null && favCount > 0}}">已有{{favCount}}人收藏</text>
+      </view>
+      <view wx:if="{{guideLoading}}" class="guide-loading">准备中…</view>
+      <scroll-view wx:else scroll-y class="guide-scroll">
+        <view class="guide-sec">所需食材</view>
+        <view wx:if="{{guide.ingMain && guide.ingMain.length}}">
+          <view wx:for="{{guide.ingMain}}" wx:for-item="ing" wx:key="*this" class="guide-li">· {{ing}}</view>
+        </view>
+        <view wx:if="{{guide.seasonLine}}" class="guide-season">调料：{{guide.seasonLine}}</view>
+        <view wx:if="{{!(guide.ingMain && guide.ingMain.length) && !guide.seasonLine}}" class="guide-empty">暂无食材信息</view>
+        <view class="guide-sec">烹饪步骤</view>
+        <view wx:for="{{guide.steps}}" wx:for-item="st" wx:for-index="si2" wx:key="index" class="guide-li">{{si2 + 1}}. {{st}}</view>
+        <view wx:if="{{!guide.steps.length}}" class="guide-empty">暂无步骤信息</view>
+        <block wx:if="{{guide.tips}}">
+          <view class="guide-sec">小贴士</view>
+          <view class="guide-review">{{guide.tips}}</view>
+        </block>
+        <view class="guide-sec">点评</view>
+        <view wx:if="{{guide.review}}" class="guide-review">{{guide.review}}</view>
+        <view wx:else class="guide-empty">暂无点评</view>
+        <view class="guide-report" catchtap="onReportDish" data-name="{{guide.name}}">不喜欢 / 觉得有问题？反馈一下</view>
+      </scroll-view>
+      <view class="guide-close {{guideLoading ? 'disabled' : ''}}" catchtap="onCloseGuide">关闭</view>
+    </view>
+  </view>
+
+  <!-- 反馈补充说明（阶段5② 自定义大输入框，替代系统 editable 弹窗） -->
+  <view wx:if="{{rep.show}}" class="rep-mask" bindtap="onRepNoteCancel" catchtouchmove="noop">
+    <view class="rep-box" catchtap="noop">
+      <view class="rep-title">补充说明（选填）</view>
+      <textarea class="rep-text" value="{{rep.text}}" bindinput="onRepNoteInput" maxlength="200"
+        placeholder="例如：盐太多 / 搭配奇怪 / 步骤不对（最多 200 字）" placeholder-class="rep-ph" cursor-spacing="12"></textarea>
+      <view class="rep-actions">
+        <view class="rep-btn cancel" catchtap="onRepNoteCancel">取消</view>
+        <view class="rep-btn ok" catchtap="onRepNoteSubmit">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

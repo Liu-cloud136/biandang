@@ -1,0 +1,9 @@
+{
+  "name": "syncLexiconToEnv2",
+  "version": "1.0.0",
+  "description": "env1 主动推菜名到 env2 供去重",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

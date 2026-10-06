@@ -1,0 +1,9 @@
+{
+  "name": "redeemCode",
+  "version": "1.0.0",
+  "description": "兑换码兑换",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

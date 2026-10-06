@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>诶呀妈呀 今天吃啥呀</title>
+<meta name="description" content="不知道今天吃啥？让 AI 替你翻牌：从 4600+ 道家常菜里推荐今日菜单，附做法、热量和小贴士。">
+<link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="hero-emoji">🍚</div>
+    <h1>诶呀妈呀<br>今天吃啥呀</h1>
+    <p class="hero-sub">别刷外卖了，让 AI 替你翻牌</p>
+  </header>
+
+  <div class="toolbar">
+    <button id="favBtn">❤️ 我的收藏</button>
+    <button id="prefBtn">⚙️ 口味偏好</button>
+  </div>
+
+  <nav class="scenes" id="scenes">
+    <button class="chip active" data-scene="早餐">🌅 早餐</button>
+    <button class="chip" data-scene="午餐">🍱 午餐</button>
+    <button class="chip" data-scene="晚餐">🌆 晚餐</button>
+    <button class="chip" data-scene="下午茶">🍵 下午茶</button>
+    <button class="chip" data-scene="夜宵">🌙 夜宵</button>
+    <button class="chip" data-scene="小吃">🍢 小吃</button>
+  </nav>
+
+  <button class="decide" id="decideBtn">今天吃啥，帮我定！</button>
+  <div class="loading" id="loading" hidden>
+    <div class="loading-emoji">🍳</div>
+    <div class="loading-text" id="loadingText">正在翻菜谱…</div>
+  </div>
+  <div class="error" id="error" hidden></div>
+
+  <section id="results"></section>
+
+  <footer class="foot">
+    <p>4600+ 道家常菜 · 让吃什么变得更简单</p>
+  </footer>
+</div>
+
+<!-- 做法弹层 -->
+<div class="modal" id="guideModal" hidden>
+  <div class="modal-mask" id="guideMask"></div>
+  <div class="modal-body">
+    <button class="modal-close" id="guideClose">✕</button>
+    <div id="guideContent"></div>
+  </div>
+</div>
+
+<!-- 收藏/偏好面板 -->
+<div class="modal" id="panelModal" hidden>
+  <div class="modal-mask" id="panelMask"></div>
+  <div class="modal-body">
+    <button class="modal-close" id="panelClose">✕</button>
+    <div class="g-title" id="panelTitle"></div>
+    <div id="panelBody"></div>
+  </div>
+</div>
+
+<script src="app.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "getDecideStats",
+  "version": "1.0.0",
+  "description": "决定次数统计（头像光晕机制，零扣次）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

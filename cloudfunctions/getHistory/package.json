@@ -1,0 +1,9 @@
+{
+  "name": "getHistory",
+  "version": "1.0.0",
+  "description": "读取当前用户推荐历史",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

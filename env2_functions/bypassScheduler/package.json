@@ -1,0 +1,9 @@
+{
+  "name": "bypassScheduler",
+  "version": "1.0.0",
+  "description": "env2 旁路任务统一调度入口：任务错峰 + 额度熔断降级阶梯",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

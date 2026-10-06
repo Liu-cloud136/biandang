@@ -1,0 +1,9 @@
+{
+  "name": "manageContrib",
+  "version": "1.0.0",
+  "description": "社区贡献人工审核与合并（后台工具）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

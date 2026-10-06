@@ -1,0 +1,43 @@
+<view class="page">
+  <!-- 余额卡 -->
+  <view class="balance-card">
+    <view class="bc-main">
+      <view class="bc-label">当前剩余次数</view>
+      <view class="bc-num">
+        <text class="bc-num-big">{{freeCountText}}</text>
+        <text class="bc-unit">次</text>
+      </view>
+    </view>
+    <view class="bc-sub">购买次数不设上限</view>
+  </view>
+
+  <!-- 套餐列表 -->
+  <view class="sec-title">次数套餐</view>
+  <view class="goods">
+    <view class="pkg" wx:for="{{goods}}" wx:key="productId">
+      <view class="pkg-left">
+        <view class="pkg-name">{{item.name}} · {{item.count}}次</view>
+      </view>
+      <view class="pkg-right">
+        <view class="pkg-price-row">
+          <view class="pkg-price"><text class="cur">¥</text>{{item.priceText}}</view>
+          <text class="pkg-orig" wx:if="{{item.origPrice}}">¥{{item.origPriceText}}</text>
+        </view>
+        <view class="pkg-buy {{buyingId === item.productId ? 'buying' : ''}}" bindtap="onBuy" data-id="{{item.productId}}">
+          {{buyingId === item.productId ? '支付中…' : '购买'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !goods.length}}">
+    <view class="emoji">🛒</view>
+    <view>暂无可购买套餐</view>
+  </view>
+
+  <!-- 说明 -->
+  <view class="foot-note">
+    <view class="fn-row">· 支持设备：Android（iOS 购买功能开发中）</view>
+    <view class="fn-row">· 支付成功后次数自动到账，可回首页点「剩余次数」查看明细</view>
+  </view>
+</view>

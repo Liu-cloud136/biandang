@@ -1,0 +1,57 @@
+<page-meta page-style="{{ (showCostConfirm || loading) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <!-- 上部功能区 -->
+  <view class="func">
+    <view class="tabs">
+      <view class="tab {{mode === 'fridge' ? 'on' : ''}}" bindtap="onFridgeMode" data-mode="fridge">现有食材</view>
+      <view class="tab {{mode === 'leftover' ? 'on' : ''}}" bindtap="onFridgeMode" data-mode="leftover">剩菜改造</view>
+    </view>
+    <textarea class="f-input" placeholder="{{ mode === 'leftover' ? '如：剩饭、炒青菜、半根火腿' : '如：鸡蛋、西红柿、土豆、青椒' }}" value="{{input}}" bindinput="onInput" maxlength="200" auto-height />
+    <view class="f-tip" wx:if="{{result.length === 0 && msg}}">{{msg}}</view>
+    <view class="f-result" wx:if="{{result.length}}">
+      <view class="f-item {{item.selected ? 'sel' : ''}}" wx:for="{{result}}" wx:key="name" bindtap="onToggleDish" data-idx="{{index}}">
+        <view class="f-check {{item.selected ? 'on' : ''}}"></view>
+        <view class="f-name">{{item.name}}</view>
+      </view>
+      <view class="f-save" bindtap="onSavePick">{{saving ? '保存中...' : '保存所选'}}</view>
+    </view>
+    <view class="f-actions" wx:if="{{result.length === 0}}">
+      <view class="f-btn confirm {{loading ? 'loading' : ''}}" bindtap="onFridgeSubmit">想想能做什么</view>
+    </view>
+  </view>
+
+  <!-- 下部记录区 -->
+  <view class="rec-head">
+    <text class="rec-title">历史记录</text>
+    <text class="rec-hint">点击进入 · 长按删除</text>
+  </view>
+  <view class="rec-empty" wx:if="{{records.length === 0}}">还没有记录，快试一次吧</view>
+  <view class="rec-card" wx:for="{{records}}" wx:key="_id" bindtap="onOpenRecord" bindlongpress="onDeleteRecord" data-id="{{item._id}}" data-type="{{item.type}}">
+    <view class="rec-row">
+      <view class="rec-time">{{item._hm}}</view>
+      <view class="rec-tag rec-tag--{{item.type}}">{{item.type === 'leftover' ? '剩菜改造' : '现有食材'}}</view>
+    </view>
+  </view>
+
+  <!-- 消耗次数二次确认 -->
+  <view wx:if="{{showCostConfirm}}" class="claim-mask" catchtap="onCostCancel" catchtouchmove="noop">
+    <view class="claim-box cost-box" catchtap="noop">
+      <view class="claim-title">确认消耗次数</view>
+      <view class="cost-desc">本次将消耗 <text class="cost-num">1</text> 次免费次数，确定吗？</view>
+      <view class="claim-actions">
+        <view class="claim-btn cancel" bindtap="onCostCancel">再想想</view>
+        <view class="claim-btn confirm" bindtap="onCostConfirm">就这样</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生成中：自绘加载弹窗（含不确定态流光进度条，与主页风格一致） -->
+  <view wx:if="{{loading}}" class="gen-mask" catchtap="noop" catchtouchmove="noop">
+    <view class="gen-box" catchtap="noop">
+      <view class="gen-spin"></view>
+      <view class="gen-title">{{loadingText}}</view>
+      <view class="gen-bar"><view class="gen-bar-fill"></view></view>
+      <view class="gen-tip">正对着手头的食材想办法，稍等一下～</view>
+    </view>
+  </view>
+</view>

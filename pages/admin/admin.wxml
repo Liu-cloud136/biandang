@@ -1,0 +1,677 @@
+<page-meta page-style="{{ showCatSheet ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="root">
+<view class="login" wx:if="{{showLogin}}">
+  <view class="login-box">
+    <view class="field"><text class="fl">openid</text><input class="fi" placeholder="管理员 openid" placeholder-class="ph" adjust-position="{{false}}" cursor-spacing="20" bindinput="onLoginOpenid" /></view>
+    <view class="field"><text class="fl">密码</text><input class="fi" type="text" value="{{loginPwd}}" adjust-position="{{false}}" placeholder="管理员密码" placeholder-class="ph" cursor-spacing="20" bindinput="onLoginPwd" /></view>
+    <view class="btn-primary" bindtap="doLogin">进入后台</view>
+  </view>
+</view>
+<view class="page" wx:if="{{!showLogin && isAdmin}}">
+  <!-- 顶部 Tab -->
+  <scroll-view class="tabs" scroll-x>
+    <view class="tab {{tab===idx ? 'on' : ''}}" wx:for="{{tabs}}" wx:key="*this" wx:for-index="idx" data-tab="{{idx}}" bindtap="switchTab">{{item}}</view>
+  </scroll-view>
+
+  <!-- 0. 发次发放 -->
+  <view class="card" wx:if="{{tab===0}}">
+    <view class="card-h">发放免费次数</view>
+    <view class="field"><text class="fl">openid</text><input class="fi" placeholder="用户 openid" value="{{grantOpenid}}" bindinput="onGrantOpenid" /></view>
+    <view class="field"><text class="fl">次数</text><input class="fi" type="number" placeholder="正整数" value="{{grantCount}}" bindinput="onGrantCount" /></view>
+    <view class="row-btns">
+      <view class="btn-primary" bindtap="doGrant">发放</view>
+      <view class="btn-ghost" bindtap="grantSelf">发给自己</view>
+    </view>
+  </view>
+
+  <!-- 12. 用户管理：用户列表 + 精确查询 -->
+  <view class="card" wx:if="{{tab===12}}">
+    <view class="card-h">用户列表（共 {{userTotal}} 人）</view>
+    <view wx:if="{{userLoading}}" class="empty">加载中…</view>
+    <view wx:elif="{{userList.length === 0}}" class="empty">暂无用户</view>
+    <scroll-view wx:else scroll-y class="list scroll">
+      <view class="item user-item" wx:for="{{userList}}" wx:key="openid" data-no="{{item.userNo}}" data-openid="{{item.openid}}" bindtap="onUserListTap">
+        <view class="item-main">
+          <text class="item-t">{{item.userNo == null ? '未分配' : (item.userNo === 'admin' ? 'admin' : '#' + item.userNo)}}　{{item.openidMask}}</text>
+          <text class="item-s">剩余 {{item.freeCount}}（base {{item.baseFree}} + bonus {{item.bonusFree}}）{{item.banned ? '　· 已封禁' : ''}}</text>
+        </view>
+        <view class="item-act">
+          <view class="mini-btn {{item.banned ? 'st-valid' : 'st-block'}}">{{item.banned ? '封禁中' : '正常'}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="pager" wx:if="{{userPages > 1}}">
+      <view class="pg-btn {{userPage <= 0 ? 'pg-dis' : ''}}" bindtap="onUserPagePrev">上一页</view>
+      <text class="pg-text">{{userPage + 1}} / {{userPages}}</text>
+      <view class="pg-btn {{userPage + 1 >= userPages ? 'pg-dis' : ''}}" bindtap="onUserPageNext">下一页</view>
+    </view>
+
+    <view class="divider"></view>
+    <view class="card-h">精确查询</view>
+    <view class="field"><text class="fl">openid/ID</text><input class="fi" placeholder="openid 或数字 userNo" value="{{userQueryKey}}" bindinput="onUserKey" /></view>
+    <view class="btn-ghost" bindtap="doUserQuery">查询</view>
+    <view class="userbox" wx:if="{{userQueryResult}}">
+      <view class="urow"><text>userNo</text><text>{{userQueryResult.userNo == null ? '未分配' : userQueryResult.userNo}}</text></view>
+      <view class="urow"><text>剩余次数</text><text>{{userQueryResult.freeCount}}（base {{userQueryResult.baseFree}} + bonus {{userQueryResult.bonusFree}}）</text></view>
+      <view class="urow"><text>贡献数</text><text>{{userQueryResult.contribCount}}</text></view>
+      <view class="urow"><text>反馈数</text><text>{{userQueryResult.feedbackCount}}</text></view>
+      <view class="urow"><text>状态</text><text class="{{userQueryResult.banned ? 'ban-on' : ''}}">{{userQueryResult.banned ? '已封禁' : '正常'}}</text></view>
+      <view class="urow"><text>openid</text><text class="mono">{{userQueryResult.openid}}</text></view>
+      <view class="btn-warn" bindtap="toggleBan">{{userQueryResult.banned ? '解封用户' : '封禁用户'}}</view>
+    </view>
+  </view>
+
+  <!-- 1. 黑名单 -->
+  <view class="card" wx:if="{{tab===1}}">
+    <view class="card-h">全局禁用词（黑名单）</view>
+    <view class="field"><text class="fl">词</text><input class="fi" placeholder="如：怪异菜名" value="{{blockTerm}}" bindinput="onBlockTerm" /></view>
+    <view class="field"><text class="fl">类型</text>
+      <picker mode="selector" range="{{blockTypeOptions}}" range-key="label" value="{{blockTypeIndex}}" bindchange="onBlockType">
+        <view class="picker">{{blockTypeOptions[blockTypeIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="field"><text class="fl">备注</text><input class="fi" placeholder="可选" value="{{blockNote}}" bindinput="onBlockNote" /></view>
+    <view class="btn-primary" bindtap="addBlock">添加</view>
+
+    <view class="divider"></view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item" wx:for="{{blocklist}}" wx:key="_id">
+        <view class="item-main">
+          <text class="item-t">{{item.term}}</text>
+          <text class="tag">{{item.typeLabel}}</text>
+          <text class="item-sub">{{item.note}}</text>
+        </view>
+        <view class="item-del" data-id="{{item._id}}" data-term="{{item.term}}" bindtap="removeBlock">删</view>
+      </view>
+      <view class="empty" wx:if="{{blocklist.length===0}}">暂无黑名单词</view>
+    </scroll-view>
+  </view>
+
+  <!-- 2. 反馈审核 -->
+  <view class="card" wx:if="{{tab===2}}">
+    <view class="card-h">推荐反馈审核（有效 +1 次）</view>
+    <view class="field"><text class="fl">状态</text>
+      <picker mode="selector" range="{{feedbackStatusOptions}}" range-key="label" value="{{feedbackFilterIndex}}" bindchange="onFeedbackFilter">
+        <view class="picker">{{feedbackStatusOptions[feedbackFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{feedbackList}}" wx:key="_id">
+        <view class="item-main">
+          <text class="item-t">{{item.dish}}</text>
+          <text class="item-sub">用户No.{{item.userNo}} · {{item.timeText}}</text>
+          <text class="item-sub" wx:if="{{item.report}}">类型：{{item.report}}</text>
+          <text class="item-sub" wx:if="{{item.note}}">备注：{{item.note}}</text>
+        </view>
+        <view class="item-acts">
+          <view class="mini ok" wx:if="{{item.status!=='valid'}}" data-id="{{item._id}}" data-decision="valid" data-source="{{item.source}}" bindtap="reviewFeedback">有效</view>
+          <view class="mini no" wx:if="{{item.status!=='invalid'}}" data-id="{{item._id}}" data-decision="invalid" bindtap="reviewFeedback">无效</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{feedbackList.length===0}}">暂无反馈</view>
+    </scroll-view>
+
+    <view class="divider"></view>
+    <view class="sub-h">用户意见反馈（我的页提交）</view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{opinionList}}" wx:key="_id">
+        <view class="item-main">
+          <text class="item-t">{{item.text}}</text>
+          <text class="item-sub">{{item.timeText}}</text>
+        </view>
+        <view class="item-acts">
+          <view class="mini no" data-id="{{item._id}}" bindtap="deleteOpinion">删除</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{opinionList.length===0}}">暂无意见反馈</view>
+    </scroll-view>
+  </view>
+
+  <!-- 3. 贡献审核 -->
+  <view class="card" wx:if="{{tab===3}}">
+    <view class="card-h">社区贡献审核与合并</view>
+    <view class="stats" wx:if="{{contribStats}}">
+      <text class="stat">已通过 {{contribStats.valid}}</text><text class="stat">待审核 {{contribStats.pending}}</text><text class="stat">重复 {{contribStats.dup}}</text><text class="stat">虚假 {{contribStats.fabricated}}</text><text class="stat">已合并 {{contribStats.merged}}</text><text class="stat">已驳回 {{contribStats.blocked}}</text>
+    </view>
+    <view class="btn-primary" bindtap="doMerge">立即合并（强制）</view>
+    <view class="field" style="margin-top:16rpx"><text class="fl">状态</text>
+      <picker mode="selector" range="{{contribStatusOptions}}" range-key="label" value="{{contribFilterIndex}}" bindchange="onContribFilter">
+        <view class="picker">{{contribStatusOptions[contribFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{contribList}}" wx:key="_id">
+        <view class="item-main">
+          <text class="item-t">{{item.display}}</text>
+          <text class="tag">{{item.typeLabel}}</text>
+          <text class="tag cat" wx:if="{{item.categoryLabel}}">{{item.categoryLabel}}</text>
+          <text class="item-sub">用户No.{{item.userNo}} · {{item.timeText}}</text>
+          <text class="item-sub reason" wx:if="{{item.reason}}">AI理由：{{item.reason}}</text>
+        </view>
+        <view class="item-acts">
+          <view class="mini ok" data-id="{{item._id}}" bindtap="mergeOneContrib" wx:if="{{item.status === 'pending' || item.status === 'valid'}}">合并</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="deleteContrib" wx:if="{{item.status === 'fabricated' || item.status === 'blocked' || item.status === 'merged' || item.status === 'dup'}}">删除</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="rejectContrib" wx:else>驳回</view>
+          <view class="mini cat" wx:if="{{item.typeLabel==='食材' && (item.status === 'pending' || item.status === 'valid' || item.status === 'merged')}}" data-id="{{item._id}}" data-cat="{{item.categoryLabel}}" bindtap="openCatEdit">改分类</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{contribList.length===0}}">暂无记录</view>
+    </scroll-view>
+  </view>
+
+  <!-- 分类修改弹窗 -->
+  <view class="sheet-mask" wx:if="{{showCatSheet}}" bindtap="closeCatSheet" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-h">修改食材分类</view>
+      <view class="sheet-tip">当前分类：{{catEditValue}}</view>
+      <view class="cat-grid">
+        <view class="cat-chip {{catEditValue===item?'on':''}}" wx:for="{{categoryOptions}}" wx:key="*this" data-cat="{{item}}" bindtap="onCatPick">{{item}}</view>
+      </view>
+      <view class="sheet-btns">
+        <view class="btn-ghost" bindtap="closeCatSheet">取消</view>
+        <view class="btn-primary" bindtap="confirmCatEdit">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 4. 备份 -->
+  <view class="card" wx:if="{{tab===4}}">
+    <view class="card-h">数据备份（全部用户）</view>
+    <view class="tip">列表含每位用户的备份与「全量备份」。恢复/删除支持跨用户；全量备份恢复将覆盖所有用户数据。</view>
+    <view class="row-btns">
+      <view class="btn-primary" bindtap="doBackup">备份我的数据</view>
+      <view class="btn-primary" bindtap="doGlobalBackup">创建全量备份</view>
+    </view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item" wx:for="{{backups}}" wx:key="_id">
+        <view class="item-main" bindtap="restoreBackup" data-id="{{item.id}}" data-openid="{{item.openid}}" data-scope="{{item.scope}}">
+          <text class="item-t">{{item.label}}</text>
+          <text class="item-sub">含 {{item.count}} 条 · {{item.scope === 'global' ? '点击全量恢复' : '点击恢复'}}</text>
+          <text class="item-sub owner">归属 {{item.owner}}</text>
+        </view>
+        <view class="item-del" data-id="{{item.id}}" data-openid="{{item.openid}}" data-scope="{{item.scope}}" bindtap="deleteBackup">删</view>
+      </view>
+      <view class="empty" wx:if="{{backups.length===0}}">暂无备份</view>
+    </scroll-view>
+  </view>
+
+  <!-- 5. 公告 -->
+  <view class="card" wx:if="{{tab===5}}">
+    <view class="card-h">首页公告</view>
+    <textarea class="ta" placeholder="公告内容（多条可用｜分隔）" value="{{annContent}}" bindinput="onAnnContent" maxlength="1000" />
+    <view class="btn-primary" bindtap="saveAnnouncement">保存公告</view>
+  </view>
+  <!-- 5b. 使用说明（guide_docs） -->
+  <view class="card" wx:if="{{tab===5}}">
+    <view class="card-h">使用说明（首页弹层，云端下发）</view>
+    <view class="tip">每行一条「标题｜正文」（标题与正文之间用全角竖线｜分隔）；标题前加 * 标记为红色高亮重要条。编号自动按顺序生成，标题里不用写。</view>
+    <textarea class="ta guide-ta" placeholder="每行一条：标题｜正文&#10;示例：尝鲜｜每道菜下方「想尝试一些其他的？」可跳出偏好……" value="{{guideContent}}" bindinput="onGuideContent" maxlength="6000" />
+    <view class="btn-primary" bindtap="saveGuide">保存使用说明</view>
+  </view>
+
+  <!-- 6. 账户 -->
+  <view class="card" wx:if="{{tab===6}}">
+    <view class="card-h">注销指定用户</view>
+    <view class="field"><text class="fl">openid</text><input class="fi" placeholder="目标用户 openid" value="{{targetOpenid}}" bindinput="onTargetOpenid" /></view>
+    <view class="btn-danger" bindtap="deleteTarget">注销该用户（删全部数据）</view>
+    <view class="tip">管理员自身不可注销（受保护）。</view>
+  </view>
+
+  <!-- 7. 协同过滤(CF)影子模式开关（管理员，2026-08-07） -->
+  <view class="card" wx:if="{{tab===7}}">
+    <view class="card-h">协同过滤 · 影子模式开关</view>
+    <view class="cf-row">
+      <view class="cf-switch-side">
+        <text class="cf-title">功能开关</text>
+        <text class="cf-sub">{{cfEnabled ? '已开启' : '已关闭'}}</text>
+      </view>
+      <switch checked="{{cfEnabled}}" color="#07c160" disabled="{{cfLoading}}" bindchange="toggleCFSwitch" />
+    </view>
+
+    <!-- 进度：两大就绪指标 + 门槛，直观显示「距离可安全开启还差多少」 -->
+    <view class="cf-progress">
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">活跃用户</text>
+        <view class="cf-bar-track"><view class="cf-bar-fill {{cfUsers >= cfThresholdUsers ? 'ok' : ''}}" style="width:{{cfUsersPct}}%"></view></view>
+        <text class="cf-bar-num">{{cfUsers}} / {{cfThresholdUsers}}</text>
+      </view>
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">共现对</text>
+        <view class="cf-bar-track"><view class="cf-bar-fill {{cfPairs >= cfThresholdPairs ? 'ok' : ''}}" style="width:{{cfPairsPct}}%"></view></view>
+        <text class="cf-bar-num">{{cfPairs}} / {{cfThresholdPairs}}</text>
+      </view>
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">物品数</text>
+        <text class="cf-bar-num2">{{cfItems}}</text>
+      </view>
+    </view>
+
+    <!-- 注释：明确开启时机 -->
+    <view class="cf-note">
+      <text class="cf-note-h">何时开启</text>
+      <text class="cf-note-p">协同过滤靠「用户间行为交叉」，小样本会过拟合乱推。待上方「活跃用户 ≥ {{cfThresholdUsers}} 且 共现对 ≥ {{cfThresholdPairs}}」两项均达标（进度条变绿、数据就绪）后，再打开本开关即可平滑启用，无需改代码重新部署。也可在未达标时强制开启（会弹确认）。</text>
+      <text class="cf-note-p" wx:if="{{cfReady}}">✅ 数据已达标，{{cfCanEnable ? '建议开启。' : '开关已开启。'}}</text>
+      <text class="cf-note-p" wx:elif="{{cfCanEnable}}">✅ 数据已达标，建议开启。</text>
+      <text class="cf-note-p" wx:else>⏳ 数据积累中，暂不建议开启（模型由 computeCF 离线任务计算，跑出 cf_ready 后此处进度自动更新）。</text>
+      <text class="cf-note-p" wx:if="{{cfComputedAtText}}">上次模型计算：{{cfComputedAtText}}</text>
+    </view>
+  </view>
+
+  <!-- 8. B② Thompson 采样开关与进度（管理员，2026-08-08） -->
+  <view class="card" wx:if="{{tab===8}}">
+    <view class="card-h">B② · Thompson 采样开关</view>
+    <view class="cf-row">
+      <view class="cf-switch-side">
+        <text class="cf-title">功能开关</text>
+        <text class="cf-sub">{{thEnabled ? '已开启' : '已关闭'}}</text>
+      </view>
+      <switch checked="{{thEnabled}}" color="#07c160" disabled="{{thLoading}}" bindchange="toggleThompsonSwitch" />
+    </view>
+
+    <!-- 进度：达标臂占比 + 全局探索采纳率，直观显示「开了之后能真正用上多少」 -->
+    <view class="cf-progress">
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">达标臂</text>
+        <view class="cf-bar-track"><view class="cf-bar-fill {{thArmsQualified >= thArms && thArms > 0 ? 'ok' : ''}}" style="width:{{thArmsPct}}%"></view></view>
+        <text class="cf-bar-num">{{thArmsQualified}} / {{thArms}}</text>
+      </view>
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">采纳率</text>
+        <view class="cf-bar-track"><view class="cf-bar-fill {{thAcceptRatePct >= 40 ? 'ok' : ''}}" style="width:{{thAcceptRatePct}}%"></view></view>
+        <text class="cf-bar-num">{{thAcceptRatePct}}%</text>
+      </view>
+      <view class="cf-bar-line">
+        <text class="cf-bar-label">推送/采纳</text>
+        <text class="cf-bar-num2">{{thTotalCnt}} / {{thTotalAccept}}</text>
+      </view>
+    </view>
+
+    <!-- 单臂明细：可展开列表，逐方向显示 cnt/accept/达标；达标高亮 -->
+    <view class="cf-list-toggle" bindtap="toggleThList">
+      <text>{{thShowList ? '收起明细 ▲' : '展开单臂明细 ▼'}}</text>
+      <text class="cf-list-count">共 {{thArms}} 臂</text>
+    </view>
+    <view class="cf-list" wx:if="{{thShowList}}">
+      <view wx:if="{{thArmsList.length === 0}}" class="cf-list-empty">暂无探索臂数据（用户尚未采纳过探索方向）</view>
+      <view wx:for="{{thArmsList}}" wx:key="dir" class="cf-list-row {{item.qualified ? 'q' : ''}}">
+        <text class="cf-list-dir">{{item.dir}}</text>
+        <text class="cf-list-meta">推 {{item.cnt}} · 采 {{item.accept}}</text>
+        <text class="cf-list-badge {{item.qualified ? 'ok' : ''}}">{{item.qualified ? '达标' : '未满'}}</text>
+      </view>
+    </view>
+
+    <view class="cf-note">
+      <text class="cf-note-h">门槛与说明</text>
+      <text class="cf-note-p">单臂达标门槛：采纳≥ {{thMinSuccess}} 且 推送≥ {{thMinTotal}}。仅达标的探索臂在开关开启后切换为 Beta 抽样（后验期望选向），未达标臂仍走 UCB，保持冷启动均匀探索。门槛可在 sys_config/thompson_switch 调整。</text>
+      <text class="cf-note-p" wx:if="{{thEnabled && thArmsQualified > 0}}">✅ 开关已开启，{{thArmsQualified}} 个臂走 Thompson 采样。</text>
+      <text class="cf-note-p" wx:elif="{{thEnabled}}">⏳ 开关已开启，但尚无达标臂，实际仍全部走 UCB（等同未开，待数据积累）。</text>
+      <text class="cf-note-p" wx:else>⏳ 开关关闭中。达标臂越多、采纳率越高，开启后收益越大。</text>
+      <text class="cf-note-p" wx:if="{{thUpdatedAtText}}">上次开关更新：{{thUpdatedAtText}}</text>
+    </view>
+  </view>
+
+  <!-- 9. 数据看板 -->
+  <view class="card" wx:if="{{tab===9}}">
+    <view class="card-h">数据看板</view>
+    <view class="refresh-bar">
+      <text class="refresh" bindtap="loadAdminStats">刷新</text>
+    </view>
+    <view class="tip" wx:if="{{statsLoading}}">统计计算中，请稍候…</view>
+    <block wx:if="{{stats}}">
+      <view class="kv"><text>统计周期</text><text class="kv-v">近 {{stats.rangeDays}} 天</text></view>
+      <view class="kv"><text>总用户数</text><text class="kv-v">{{stats.totals.users}}</text></view>
+      <view class="kv"><text>已封禁</text><text class="kv-v ban">{{stats.totals.banned}}</text></view>
+      <view class="kv"><text>历史推荐数</text><text class="kv-v">{{stats.totals.history}}</text></view>
+      <view class="kv"><text>今日推荐数</text><text class="kv-v">{{stats.today.history}}</text></view>
+      <view class="kv"><text>昨日推荐数</text><text class="kv-v">{{stats.yesterday.history}}</text></view>
+      <view class="kv"><text>周期内活跃用户</text><text class="kv-v">{{stats.range.activeUsers}}</text></view>
+      <view class="kv"><text>周期内采纳次数</text><text class="kv-v">{{stats.range.commitCount}}</text></view>
+      <view class="kv"><text>菜谱库</text><text class="kv-v">{{stats.totals.dishLibrary}}</text></view>
+      <view class="kv"><text>食材库</text><text class="kv-v">{{stats.totals.ingredientLibrary}}</text></view>
+      <view class="kv"><text>收藏数</text><text class="kv-v">{{stats.totals.favorites}}</text></view>
+      <view class="kv"><text>待审贡献</text><text class="kv-v">{{stats.totals.contribPending}}</text></view>
+      <view class="kv"><text>反馈数</text><text class="kv-v">{{stats.totals.feedback}}</text></view>
+      <view class="kv"><text>菜谱指南</text><text class="kv-v">{{stats.totals.cookGuides}}</text></view>
+      <view class="kv"><text>黑名单词</text><text class="kv-v">{{stats.totals.blocklist}}</text></view>
+      <view class="tip" wx:if="{{stats.range.truncated}}">注：历史数据量过大，热门菜/趋势仅基于扫描的 {{stats.range.scanned}} 条，可能不完全。</view>
+
+      <view class="sub-h">周期内热门菜（采纳 Top）</view>
+      <view class="rank" wx:if="{{stats.range.topDishes.length}}">
+        <view class="rank-row" wx:for="{{stats.range.topDishes}}" wx:key="name">
+          <text class="rank-no">{{index+1}}</text>
+          <text class="rank-name">{{item.name}}</text>
+          <text class="rank-cnt">{{item.cnt}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:else>暂无采纳数据</view>
+
+      <view class="sub-h">近 14 天活跃用户趋势</view>
+      <view class="trend" wx:if="{{stats.range.trend.length}}">
+        <view class="trend-row" wx:for="{{stats.range.trend}}" wx:key="date">
+          <text class="trend-date">{{item.date}}</text>
+          <view class="trend-bar"><view class="trend-fill" style="width:{{ item.uv / maxTrend * 100 }}%"></view></view>
+          <text class="trend-uv">{{item.uv}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:else>暂无趋势数据</view>
+    </block>
+    <view class="empty" wx:elif="{{!statsLoading}}">暂无统计数据</view>
+  </view>
+
+  <!-- 10. 截断修复（系统误伤 · 隔离表 dish_name_fix，不进黑名单，valid 审核照常发次） -->
+  <view class="card" wx:if="{{tab===10}}">
+    <view class="tip">AI 误截断正常菜名（如「小鸡炖蘑菇」→「小鸡炖蘑」）的隔离表 dish_name_fix。仅做状态流转、不进黑名单；审核有效照常发次（source:'namefix'）。</view>
+    <view class="field"><text class="fl">状态</text>
+      <picker mode="selector" range="{{nameFixStatusOptions}}" range-key="label" value="{{nameFixFilterIndex}}" bindchange="onNameFixFilter">
+        <view class="picker">{{nameFixStatusOptions[nameFixFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <scroll-view scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{nameFixList}}" wx:key="_id">
+        <view class="item-main">
+          <text class="item-t">{{item.dish}}</text>
+          <text class="item-sub" wx:if="{{item.userNo == null}}">用户 No.未知</text>
+          <text class="item-sub" wx:else>用户No.{{item.userNo}} · {{item.timeText}}</text>
+          <text class="item-sub" wx:if="{{item.report}}">类型：{{item.report}}</text>
+          <text class="item-sub" wx:if="{{item.fixed}}">补全为：{{item.fixed}}</text>
+          <text class="item-sub" wx:if="{{item.note}}">备注：{{item.note}}</text>
+        </view>
+        <view class="item-acts" wx:if="{{item.status==='pending'}}">
+          <view class="mini ok" data-id="{{item._id}}" data-decision="valid" bindtap="reviewNameFix">有效</view>
+          <view class="mini no" data-id="{{item._id}}" data-decision="invalid" bindtap="reviewNameFix">无效</view>
+        </view>
+        <view class="item-acts" wx:if="{{item.status==='valid'}}">
+          <view class="mini no" data-id="{{item._id}}" data-decision="invalid" bindtap="reviewNameFix">无效</view>
+        </view>
+        <view class="item-acts">
+          <view class="mini no" data-id="{{item._id}}" bindtap="deleteNameFix">删除</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{nameFixList.length===0}}">暂无截断修复反馈</view>
+    </scroll-view>
+  </view>
+
+  <!-- tab 11 兑换码管理 -->
+  <view wx:if="{{tab===11}}" class="card">
+    <!-- 区域一：新建兑换码 -->
+    <view class="rd-block rd-create-block">
+      <view class="rd-stats" wx:if="{{redeemList.length}}">
+        <view class="rd-stat"><text class="rd-stat-n">{{rdTotal}}</text><text class="rd-stat-l">总码数</text></view>
+        <view class="rd-stat"><text class="rd-stat-n">{{rdActive}}</text><text class="rd-stat-l">启用中</text></view>
+        <view class="rd-stat"><text class="rd-stat-n">{{rdLifeUsed}}</text><text class="rd-stat-l">累计发放(次)</text></view>
+      </view>
+      <view class="field"><text class="fl">每张发放次数</text><input class="fi" type="number" value="{{rdCount}}" placeholder="如 25" bindinput="onRdCount" /></view>
+      <view class="field"><text class="fl">总可兑换人数</text><input class="fi" type="number" value="{{rdQuota}}" placeholder="如 100" bindinput="onRdQuota" /></view>
+      <view class="field"><text class="fl">有效期(天)</text><input class="fi" type="number" value="{{rdExpire}}" placeholder="留空=长期" bindinput="onRdExpire" /></view>
+      <view class="field"><text class="fl">指定码</text><input class="fi" value="{{rdCode}}" placeholder="留空=系统随机(推荐)" bindinput="onRdCode" /></view>
+      <view class="field"><text class="fl">备注说明</text><input class="fi" value="{{rdDesc}}" placeholder="如 内测福利" bindinput="onRdDesc" /></view>
+      <view class="btn-primary rd-create" bindtap="createRedeemCode">生成兑换码</view>
+    </view>
+
+    <view class="rd-divider"></view>
+
+    <!-- 区域二：已建兑换码记录 -->
+    <view class="rd-block rd-list-block">
+      <view class="rd-block-h">已建兑换码</view>
+      <scroll-view scroll-y class="list scroll rd-list">
+        <view class="rd-item" wx:for="{{redeemList}}" wx:key="code">
+          <view class="rd-item-head">
+            <text class="rd-code" data-code="{{item.code}}" bindtap="copyRedeemCode">{{item.code}}</text>
+          </view>
+          <view class="rd-item-meta">每张 {{item.count}} 次 · 已领 {{item.used}}/{{item.quota}} 人 · {{item.expireText}}</view>
+          <view class="rd-item-meta" wx:if="{{item.desc}}">说明：{{item.desc}}</view>
+          <view class="rd-item-acts">
+            <view class="mini {{item.active ? '' : 'dim'}}" data-code="{{item.code}}" bindtap="disableRedeemCode">{{item.active ? '停用' : '已停用'}}</view>
+            <view class="mini no" data-code="{{item.code}}" bindtap="deleteRedeemCode">删除</view>
+          </view>
+        </view>
+        <view class="empty" wx:if="{{redeemList.length===0}}">暂无兑换码</view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 13. 探索菜库审核（dish_lexicon_pending，2026-08-17） -->
+  <view class="card" wx:if="{{tab===13}}">
+    <view class="card-h">探索菜库审核（AI 现编探索菜沉淀池）</view>
+    <view class="tip">探索机制 AI 现编的菜会先进入此审核池，管理员审核通过后写入 dish_lexicon 正式菜库，供后续出文复用。驳回则丢弃。</view>
+    <view class="field"><text class="fl">状态</text>
+      <picker mode="selector" range="{{lexiconStatusOptions}}" range-key="label" value="{{lexiconFilterIndex}}" bindchange="onLexiconFilter">
+        <view class="picker">{{lexiconStatusOptions[lexiconFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{lexiconLoading}}" class="empty">加载中…</view>
+    <scroll-view wx:else scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{lexiconList}}" wx:key="_id">
+        <view class="item-main">
+          <view class="item-title-row">
+            <text class="item-t">{{item.name}}</text>
+          </view>
+          <view class="item-tags">
+            <text class="tag" wx:if="{{item.cuisine}}">{{item.cuisine}}</text>
+            <text class="tag cat" wx:if="{{item.category}}">{{item.category}}</text>
+            <text class="tag cat" wx:if="{{item.mealTime}}">{{item.mealTime}}</text>
+            <text class="tag cat" wx:if="{{item.exploreDir}}">方向:{{item.exploreDir}}</text>
+          </view>
+          <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" style="width:200rpx;height:200rpx;border-radius:8rpx;margin:4rpx 0;" />
+          <text class="item-sub" wx:if="{{item.reason}}">理由：{{item.reason}}</text>
+          <text class="item-sub" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+        </view>
+        <view class="item-acts" wx:if="{{item.statusLabel==='待审核' || item.statusLabel==='已通过'}}">
+          <view class="mini ok" data-id="{{item._id}}" bindtap="approveLexicon" wx:if="{{item.statusLabel==='待审核'}}">通过</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="rejectLexicon">驳回</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="deleteLexicon">删除</view>
+        </view>
+        <view class="item-acts" wx:elif="{{item.statusLabel==='已驳回'}}">
+          <view class="mini no" data-id="{{item._id}}" bindtap="deleteLexicon">删除</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{lexiconList.length===0}}">暂无待审菜</view>
+    </scroll-view>
+  </view>
+
+  <!-- 14. 通用配置（dynamicTabs，2026-08-18）—— 根据 dynSections schema 动态渲染，新增 A/简单B 类管理功能免发前端 -->
+  <view class="card" wx:if="{{tab===14}}">
+    <view class="card-h">通用配置</view>
+    <view class="tip">本页由后端 adminGeneric 白名单 + 前端 dynSections schema 驱动。新增已登记功能时，在 adminGeneric ALLOWED 追加 docId/字段、在 admin.js dynSections 追加 section 即可，无需新增独立 tab。</view>
+
+    <block wx:for="{{dynSections}}" wx:key="docId" wx:for-item="sec">
+      <view class="divider" wx:if="{{index>0}}"></view>
+      <view class="card-h" style="margin-top:8rpx;">{{sec.title}}</view>
+      <view class="tip">{{sec.tip}}</view>
+
+      <view class="field dyn-row" wx:if="{{dynValues[sec.docId]}}" wx:for="{{sec.fields}}" wx:key="key" wx:for-item="f">
+        <!-- boolean → 开关靠右 -->
+        <block wx:if="{{f.type==='boolean'}}">
+          <text class="fl">{{f.label}}</text>
+          <switch class="dyn-sw" checked="{{dynValues[sec.docId][f.key]}}" color="#FF8C42" data-doc-id="{{sec.docId}}" data-key="{{f.key}}" bindchange="dynSwitch" />
+        </block>
+        <!-- enum → 下拉 -->
+        <block wx:elif="{{f.type==='enum'}}">
+          <text class="fl">{{f.label}}</text>
+          <picker mode="selector" range="{{f.options}}" range-key="label" value="{{dynIndex[sec.docId][f.key]}}" bindchange="dynEnumChange" data-doc-id="{{sec.docId}}" data-key="{{f.key}}">
+            <view class="picker">{{f.options[dynIndex[sec.docId][f.key]].label}}</view>
+          </picker>
+        </block>
+        <!-- string → 文本输入 -->
+        <block wx:else>
+          <text class="fl">{{f.label}}</text>
+          <input class="fi" value="{{dynValues[sec.docId][f.key]}}" placeholder="未设置" data-doc-id="{{sec.docId}}" data-key="{{f.key}}" bindinput="dynInput" />
+        </block>
+      </view>
+
+      <view class="dyn-key-box" wx:if="{{dynValues[sec.docId]}}">
+        <text class="fl" style="width:auto;">密钥配置</text>
+        <text class="tip sm" style="flex:1;">密钥不入库、不在此界面填写。请在 adminGeneric 云函数环境变量配置 {{sec.keyEnv}}（控制台或部署脚本），配置后实时生效，无需在此保存。</text>
+      </view>
+
+      <button class="save-btn" data-doc-id="{{sec.docId}}" bindtap="dynSaveSection">保存</button>
+    </block>
+
+    <view wx:if="{{dynLoading}}" class="empty">加载中…</view>
+  </view>
+
+  <!-- 15-18. 产物分流审核（画像/营养/做法/菜图，2026-08-21） -->
+  <view class="card" wx:if="{{tab>=15 && tab<=18}}">
+    <view class="card-h" wx:if="{{tab===15}}">画像审核（env2 AI 画像 → dish_lexicon.profile）</view>
+    <view class="card-h" wx:if="{{tab===16}}">营养审核（env2 营养补估 → dish_nutrition）</view>
+    <view class="card-h" wx:if="{{tab===17}}">做法审核（env2 AI 做法 → dish_guide）</view>
+    <view class="card-h" wx:if="{{tab===18}}">菜图审核（env2 AI 补图 → dish_images）</view>
+    <view class="tip">env2 产物分流到此独立审核池，通过后并入各自正式表。</view>
+    <view class="field"><text class="fl">状态</text>
+      <picker mode="selector" range="{{pendingReviewStatusOptions}}" range-key="label" value="{{pendingReviewFilterIndex}}" bindchange="onPendingReviewFilter">
+        <view class="picker">{{pendingReviewStatusOptions[pendingReviewFilterIndex].label}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{pendingReviewLoading}}" class="empty">加载中…</view>
+    <scroll-view wx:else scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{pendingReviewList}}" wx:key="_id">
+        <view class="item-main">
+          <view class="item-title-row">
+            <text class="item-t">{{item.name}}</text>
+          </view>
+          <view class="item-tags">
+            <text class="tag" wx:if="{{item.source}}">{{item.source}}</text>
+          </view>
+          <!-- 画像详情 -->
+          <view wx:if="{{tab===15 && item.profile}}">
+            <text class="item-sub">菜系：{{item.profile.cuisine}} · 类型：{{item.profile.type}}</text>
+            <text class="item-sub">主料：{{item.profile.main}} · 辣度：{{item.profile.spicy}}</text>
+            <text class="item-sub" wx:if="{{item.profile.flavorText}}">风味：{{item.profile.flavorText}}</text>
+            <text class="item-sub">素菜：{{item.profile.isVeg}} · 汤羹：{{item.profile.isSoup}}</text>
+            <text class="item-sub" wx:if="{{item.profile.mealTimeText}}">餐次：{{item.profile.mealTimeText}}</text>
+          </view>
+          <!-- 营养详情（分区带标签） -->
+          <view wx:if="{{tab===16 && item.nutrition}}">
+            <view class="item-sub"><text class="tag">热量</text> {{item.nutrition[0]}}kcal　<text class="tag">蛋白</text> {{item.nutrition[1]}}g</view>
+            <view class="item-sub"><text class="tag">碳水</text> {{item.nutrition[2]}}g　<text class="tag">脂肪</text> {{item.nutrition[3]}}g</view>
+          </view>
+          <!-- 做法详情（格式化：点评/难度 → 食材 → 步骤 → 贴士） -->
+          <view wx:if="{{tab===17}}">
+            <view class="item-sub" wx:if="{{item.difficulty || item.review}}">
+              <text class="tag" wx:if="{{item.difficulty}}">{{item.difficulty}}</text>
+              <text wx:if="{{item.review}}"> {{item.review}}</text>
+            </view>
+            <view class="item-sub" wx:if="{{item.ingredients.length>0}}">食材：<block wx:for="{{item.ingredients}}" wx:for-item="ing" wx:key="index">{{ing.name}} {{ing.amount}}{{ing.unit}}{{index < item.ingredients.length - 1 ? '、' : ''}}</block></view>
+            <block wx:if="{{item.steps.length>0}}">
+              <view class="item-sub">步骤：</view>
+              <view class="item-sub" wx:for="{{item.steps}}" wx:for-item="step" wx:key="stepNo">{{step.stepNo}}. {{step.text}}</view>
+            </block>
+            <text class="item-sub" wx:if="{{item.tips}}">贴士：{{item.tips}}</text>
+            <text class="item-sub" wx:if="{{item.guide && (!item.steps || item.steps.length===0)}}">{{item.guide}}</text>
+          </view>
+          <!-- 菜图预览（大图） -->
+          <image wx:if="{{tab===18 && item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" style="width:300rpx;height:300rpx;border-radius:8rpx;margin:4rpx 0;" />
+          <text class="item-sub" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+        </view>
+        <view class="item-acts" wx:if="{{item.statusLabel==='待审核' || item.statusLabel==='已通过'}}">
+          <view class="mini ok" data-id="{{item._id}}" bindtap="approvePendingReview" wx:if="{{item.statusLabel==='待审核'}}">通过</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="rejectPendingReview">驳回</view>
+          <view class="mini no" data-id="{{item._id}}" bindtap="deletePendingReview">删除</view>
+        </view>
+        <view class="item-acts" wx:elif="{{item.statusLabel==='已驳回'}}">
+          <view class="mini no" data-id="{{item._id}}" bindtap="deletePendingReview">删除</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{pendingReviewList.length===0}}">暂无记录</view>
+    </scroll-view>
+  </view>
+
+  <!-- 19. env2 菜审核（manageEnv2Regen，2026-08-24）—— 一键同步/一键入库/驳回丢弃 -->
+  <view class="card" wx:if="{{tab===19}}">
+    <view class="card-h">env2 菜审核（一键同步 / 一键入库 / 驳回丢弃）</view>
+    <view class="tip">env2 AI 生成的新菜经 syncFromEnv2 同步到此审核池。管理员可一键入库、驳回（附原因即整菜丢弃，并联动从 env2 真库删除同名菜+记录审计，下次同步不会拉回）。</view>
+    <view class="item-acts" style="margin:10rpx 0;">
+      <view class="mini ok" bindtap="runSync">一键同步</view>
+      <view class="mini ok" bindtap="batchApproveLexicon">一键入库</view>
+    </view>
+    <view wx:if="{{env2ReviewLoading}}" class="empty">加载中…</view>
+    <scroll-view wx:else scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{env2ReviewList}}" wx:key="_id">
+        <view class="item-main">
+          <view class="item-title-row">
+            <text class="item-t">{{item.name}}</text>
+          </view>
+          <view class="item-tags">
+            <text class="tag" wx:if="{{item.cuisine}}">{{item.cuisine}}</text>
+            <text class="tag cat" wx:if="{{item.mealTime}}">{{item.mealTime}}</text>
+          </view>
+          <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" style="width:200rpx;height:200rpx;border-radius:8rpx;margin:4rpx 0;" />
+          <text class="item-sub" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+        </view>
+        <view class="item-acts">
+          <view class="mini no" data-id="{{item._id}}" data-name="{{item.name}}" bindtap="openReject">驳回</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{env2ReviewList.length===0}}">暂无待审菜</view>
+    </scroll-view>
+  </view>
+
+  <!-- 20. env1 菜库总览（manageEnv2Regen listLexicon，2026-08-24）—— 查看所有已入库菜+配图，驳回丢弃 -->
+  <view class="card" wx:if="{{tab===20}}">
+    <view class="card-h">env1 菜库总览（已入库菜 + 配图 + 驳回丢弃）</view>
+    <view class="tip">浏览 dish_lexicon 正式菜库中所有菜。对不满意的菜可驳回并整菜丢弃（不重生成）。</view>
+    <view class="field" style="display:flex;gap:10rpx;align-items:center;">
+      <input placeholder="搜索菜名" value="{{env1LexiconKeyword}}" bindinput="onEnv1LexiconSearch" bindconfirm="doEnv1LexiconSearch" style="flex:1;border:1px solid #ddd;border-radius:8rpx;padding:10rpx;font-size:28rpx;" />
+      <view class="mini ok" bindtap="doEnv1LexiconSearch">搜索</view>
+    </view>
+    <view class="item-sub" style="margin:6rpx 0;">共 {{env1LexiconTotal}} 道 | 第 {{env1LexiconOffset+1}}~{{env1LexiconOffset + env1LexiconList.length}} 道</view>
+    <view wx:if="{{env1LexiconLoading}}" class="empty">加载中…</view>
+    <scroll-view wx:else scroll-y class="list scroll">
+      <view class="item fb" wx:for="{{env1LexiconList}}" wx:key="_id">
+        <view class="item-main">
+          <view class="item-title-row">
+            <text class="item-t">{{item.name}}</text>
+          </view>
+          <view class="item-tags">
+            <text class="tag" wx:if="{{item.cuisine}}">{{item.cuisine}}</text>
+            <text class="tag cat" wx:if="{{item.category}}">{{item.category}}</text>
+            <text class="tag cat" wx:if="{{item.source}}">{{item.source}}</text>
+          </view>
+          <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" style="width:200rpx;height:200rpx;border-radius:8rpx;margin:4rpx 0;" />
+        </view>
+        <view class="item-acts">
+          <view class="mini no" data-id="{{item._id}}" data-name="{{item.name}}" bindtap="env1LexiconReject">驳回丢弃</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{env1LexiconList.length===0}}">暂无菜</view>
+    </scroll-view>
+    <view class="item-acts" style="margin:10rpx 0;justify-content:center;">
+      <view class="mini" bindtap="env1LexiconPrevPage" wx:if="{{env1LexiconOffset>0}}">上一页</view>
+      <view class="mini" bindtap="env1LexiconNextPage" wx:if="{{env1LexiconOffset + env1LexiconList.length < env1LexiconTotal}}">下一页</view>
+    </view>
+  </view>
+
+  <view class="footer-space"></view>
+</view>
+
+<!-- 统一结果弹窗（替代行内提示） -->
+<view class="alert-mask" wx:if="{{alert.show}}" bindtap="closeAlert">
+  <view class="alert-box" catchtap="noop">
+    <view class="alert-title">{{alert.title}}</view>
+    <view class="alert-content">{{alert.content}}</view>
+    <view class="alert-btn" bindtap="closeAlert">我知道了</view>
+  </view>
+</view>
+</view>
+
+<!-- 一键入库自绘确认弹窗：显示入库/丢弃数量 + 将入库菜品清单，底部取消/确认 -->
+<view class="alert-mask" wx:if="{{approveConfirm.show}}" bindtap="cancelApprove">
+  <view class="alert-box approve-box" catchtap="noop">
+    <view class="alert-title">确认一键入库</view>
+    <view class="approve-stat">
+      <text class="stat-ok">入库 {{approveConfirm.approveCount}} 道</text>
+      <text class="stat-skip">丢弃(重复) {{approveConfirm.skipCount}} 道</text>
+    </view>
+    <view class="approve-sub">本次将入库以下菜品：</view>
+    <scroll-view scroll-y class="approve-list">
+      <view class="approve-item" wx:for="{{approveConfirm.list}}" wx:key="*this">{{index + 1}}. {{item}}</view>
+      <view class="approve-overflow" wx:if="{{approveConfirm.overflow > 0}}">…另有 {{approveConfirm.overflow}} 道未显示</view>
+    </scroll-view>
+    <view class="approve-acts">
+      <view class="approve-btn cancel" bindtap="cancelApprove">取消</view>
+      <view class="approve-btn confirm" bindtap="confirmApprove">确认入库</view>
+    </view>
+  </view>
+</view>
+
+<!-- env2 重新生成维度勾选弹层（已废弃：彻底无重生成） -->

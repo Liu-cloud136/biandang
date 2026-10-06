@@ -1,0 +1,9 @@
+{
+  "name": "manageAnnouncement",
+  "version": "1.0.0",
+  "description": "首页公告后台编辑（后台工具）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

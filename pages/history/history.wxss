@@ -1,0 +1,137 @@
+.page { padding: 24rpx 32rpx calc(240rpx + env(safe-area-inset-bottom)); min-height: 100vh; position: relative; box-sizing: border-box; }
+
+.offline-bar {
+  background: #fff7e6;
+  color: #ad6800;
+  font-size: 24rpx;
+  text-align: center;
+  padding: 14rpx 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.empty {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  bottom: calc(240rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #999;
+}
+.empty .emoji { font-size: 100rpx; }
+.empty .sub { font-size: 24rpx; color: #bbb; margin-top: 12rpx; }
+/* 筛选空态：复用 .empty 的整页绝对居中；自身无交互，放开点击穿透以免挡住顶部筛选条 */
+.empty.filtered { pointer-events: none; }
+
+/* 时间筛选条 */
+.filter-bar {
+  display: flex;
+  gap: 14rpx;
+  padding: 4rpx 0 20rpx;
+  flex-wrap: wrap;
+}
+.filter-bar .chip {
+  font-size: 24rpx;
+  color: #888;
+  background: #F3F3F5;
+  border-radius: 999rpx;
+  padding: 10rpx 26rpx;
+  line-height: 1;
+  transition: all .15s;
+}
+.filter-bar .chip.on {
+  color: #fff;
+  background: #E8533E;
+  font-weight: 600;
+}
+/* 列表操作提示（筛选条下，整段只显示一次，避免每卡片重复） */
+.list-hint {
+  font-size: 22rpx;
+  color: #b0a89e;
+  text-align: center;
+  margin: 16rpx 8rpx 32rpx;
+  padding: 12rpx 0;
+  border: 1rpx solid #e8e2da;
+  border-radius: 12rpx;
+}
+
+.card-wrap {
+  position: relative;
+  margin-bottom: 24rpx;
+  border-radius: 24rpx;
+}
+.card {
+  position: relative;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 16rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.04);
+  z-index: 2;
+}
+
+/* 双块并排预览：每场景一行，菜品 + 主食 */
+.rows { display: flex; flex-direction: column; gap: 16rpx; }
+.srow { display: flex; flex-direction: column; gap: 8rpx; }
+.mini-row { display: flex; gap: 14rpx; }
+.mini { flex: 1; min-width: 0; }
+.mini-img {
+  width: 100%; height: 200rpx;
+  border-radius: 16rpx;
+  background: #FFF1E8;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 60rpx; overflow: hidden;
+}
+.mini-img.ph { color: #E8A98C; }
+.mini-img-img { width: 100%; height: 100%; }
+.mini-cap {
+  margin-top: 8rpx;
+  font-size: 26rpx; color: #333; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mini-cap .tag {
+  display: inline-block;
+  font-size: 20rpx; font-weight: 700; color: #fff;
+  background: #E8533E;
+  border-radius: 8rpx;
+  padding: 1rpx 10rpx; margin-right: 8rpx;
+}
+.mini-cap .tag.staple { background: #C98A3A; }
+.mini-cap .tag.tea { background: #6B8E6B; }
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 8rpx 4rpx;
+}
+.date { font-size: 22rpx; color: #bbb; }
+
+
+/* 多场景：顶部分段标签，点标签切换当前场景；点击区大、无展开动画 */
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+.seg-item {
+  flex: 1 1 auto;
+  min-width: 120rpx;
+  text-align: center;
+  padding: 14rpx 18rpx;
+  font-size: 26rpx;
+  color: #888;
+  background: #F5F5F5;
+  border: 2rpx solid #EEE;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+}
+.seg-item.on {
+  color: #fff;
+  background: #FF8C42;
+  border-color: #FF8C42;
+  font-weight: 700;
+}

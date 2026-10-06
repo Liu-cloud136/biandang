@@ -1,0 +1,10 @@
+{
+  "name": "bypassAiEnrich",
+  "version": "1.0.0",
+  "description": "env2 候菜 AI 增强：AI-1 菜品画像 + AI-2 偏好画像（阶段1，方案 §7 阶段1）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

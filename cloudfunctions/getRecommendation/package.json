@@ -1,0 +1,11 @@
+{
+  "name": "getRecommendation",
+  "version": "1.0.0",
+  "description": "调用混元文生文+文生图生成美食推荐",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0",
+    "ws": "^8.18.0"
+  }
+}

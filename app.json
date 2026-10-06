@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/setup/setup",
+    "pages/history/history",
+    "pages/history/detail",
+    "pages/mine/mine",
+    "pages/author/author",
+    "pages/favorites/favorites",
+    "pages/admin/admin",
+    "pages/tuning/tuning",
+    "pages/shoplist/shoplist",
+    "pages/fridge/fridge",
+    "pages/week/week",
+    "pages/genDetail/genDetail",
+    "pages/paycenter/paycenter"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFF8F0",
+    "navigationBarTitleText": "",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FDF8F4"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#666666",
+    "selectedColor": "#FF8C42",
+    "backgroundColor": "#FFF8F0",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "决定" },
+      { "pagePath": "pages/history/history", "text": "历史" },
+      { "pagePath": "pages/mine/mine", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "__usePrivacyCheck__": true,
+  "sitemapLocation": "sitemap.json"
+}

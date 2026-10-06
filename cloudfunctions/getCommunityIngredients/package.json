@@ -1,0 +1,9 @@
+{
+  "name": "getCommunityIngredients",
+  "version": "1.0.0",
+  "description": "读取社区贡献食材库(ingredient_library)供前端偏好选择展示",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

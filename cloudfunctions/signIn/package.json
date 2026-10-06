@@ -1,0 +1,9 @@
+{
+  "name": "signIn",
+  "version": "1.0.0",
+  "description": "每日签到发放免费次数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

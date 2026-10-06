@@ -1,0 +1,9 @@
+{
+  "name": "commitRecommendation",
+  "version": "1.0.0",
+  "description": "前端流水出文后统一入库并扣减免费次数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

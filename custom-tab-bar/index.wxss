@@ -1,0 +1,44 @@
+/* 居中悬浮胶囊：整体比全宽更短，按钮不再挤在一起 */
+.tabbar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 540rpx;
+  bottom: calc(72rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 0;
+  padding: 24rpx 32rpx;
+  /* 半透明 + 毛玻璃：让胶囊悬浮、可透出后面内容（与其他页一致的透明感） */
+  background: rgba(255, 248, 240, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2rpx solid #F0E2D6;
+  border-radius: 40rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.10);
+  z-index: 999;
+}
+
+.tab {
+  flex: none;
+  height: 92rpx;
+  padding: 0 44rpx;
+  border: 2rpx solid #E8D5C5;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  transition: all .15s;
+}
+
+.tab.on {
+  border-color: #FF8C42;
+  background: #FFF1E8;
+  color: #E8533E;
+  font-weight: 700;
+  box-shadow: 0 4rpx 14rpx rgba(255,140,66,0.18);
+}
+
+.tab-text { font-size: 38rpx; line-height: 1; }

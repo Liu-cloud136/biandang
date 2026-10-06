@@ -1,0 +1,192 @@
+<page-meta page-style="{{ (showHierSheet || showCommunitySheet) ? 'overflow: hidden;' : '' }}"></page-meta>
+<view class="page">
+  <!-- 自定义导航栏：首次引导隐藏返回键；从「我的」修改偏好时显示 -->
+  <view class="navbar" style="padding-top: {{statusBarHeight}}px;">
+    <view wx:if="{{showBack}}" class="nav-back" bindtap="goBack">‹ 返回</view>
+  </view>
+
+  <view class="wrap">
+  <!-- 步骤指示（暂隐藏：sceneOnly 等模式下 step 为绝对步号，进度文案易错乱，暂不展示）
+  <view class="steps">
+    <view wx:for="{{steps}}" wx:key="*this"
+          class="dot {{item <= step ? 'on' : ''}}"></view>
+    <text class="step-text">第 {{step}}/{{totalStep}} 步</text>
+  </view>
+  -->
+
+  <!-- 标题 -->
+  <view class="title" wx:if="{{step===1}}">👋 先告诉我，你平时喜欢什么口味？</view>
+  <view class="title" wx:if="{{step===2}}">🌶️ 平时能吃辣吗？</view>
+  <view class="title" wx:if="{{step===3}}">🍽️ 偏爱哪些菜系？</view>
+  <view class="title" wx:if="{{step===4}}">🍚 主食偏好？</view>
+  <view class="title" wx:if="{{step===5}}">🥩 常吃的肉类有哪些？</view>
+  <view class="title" wx:if="{{step===6}}">🥬 喜欢的蔬菜/菜类有哪些？</view>
+  <view class="title" wx:if="{{step===7}}">🤝 社区贡献食材名称</view>
+  <view class="title" wx:if="{{step===8}}">🍳 菜品做法偏好？</view>
+  <view class="title" wx:if="{{step===9}}">🚫 有什么忌口吗？</view>
+  <view class="title" wx:if="{{step===10}}">🕐 用餐场景？</view>
+  <view class="title" wx:if="{{step===11}}">🥤 喜欢喝什么饮料？</view>
+
+
+  <!-- 两级联动：口味(酸甜)保留手风琴展开；其余拥有小类的大类改用原生 checkbox-group 分组多选 -->
+  <view wx:if="{{multiMode && hierMode}}">
+    <!-- 旧：口味步骤（酸甜互斥单选，保留展开组件） -->
+    <view wx:if="{{!hierNative}}" class="grid">
+      <block wx:for="{{multiOptions}}" wx:key="label">
+        <view wx:if="{{!item.expandable}}"
+              class="chip {{item.sel ? 'sel' : ''}}"
+              bindtap="toggleParent" data-label="{{item.label}}">{{item.label}}</view>
+        <view wx:else class="hier">
+          <view class="hier-head" bindtap="toggleParent" data-label="{{item.label}}">
+            <view class="chip {{item.sel ? 'sel' : ''}} hier-chip">
+              {{item.label}}
+              <view class="chev" catchtap="toggleExpand" data-label="{{item.label}}">{{item.expanded ? '▾' : '▸'}}</view>
+            </view>
+          </view>
+          <view wx:if="{{item.expanded}}" class="subgrid">
+            <view wx:for="{{item.children}}" wx:for-item="c" wx:key="label"
+                  class="chip subchip {{c.sel ? 'sel' : ''}}"
+                  bindtap="toggleChild" data-parent="{{item.label}}" data-label="{{c.label}}">{{c.label}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <!-- 新：大类平铺为 chip；有子类的大类点开「该大类专属弹窗」，无子类直接勾选 -->
+    <view wx:else class="grid">
+      <view wx:for="{{hierGroups}}" wx:key="label"
+            class="chip {{item.sel ? 'sel' : ''}}"
+            bindtap="onHierParentTap" data-label="{{item.label}}">
+        {{item.label}}
+        <view wx:if="{{item.hasChild || item.hasComm}}" class="chev" catchtap="openHierChildSheet" data-label="{{item.label}}">▸</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 每个大类专属弹窗：点大类 chip 打开，内含该大类 + 其小类的多选 -->
+  <view wx:if="{{showHierSheet}}" class="sheet-mask" catchtap="closeHierSheet" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <view class="search-bar">
+          <text class="search-ico">🔍</text>
+          <input class="search-input" value="{{sheetKeyword}}" bindinput="onSheetSearch" confirm-type="search"/>
+          <view wx:if="{{sheetKeyword}}" class="search-clear" catchtap="onSheetSearchClear">✕</view>
+        </view>
+        <view class="sheet-done" bindtap="closeHierSheet">完成</view>
+      </view>
+      <scroll-view scroll-y class="hg-scroll sheet-scroll">
+        <checkbox-group class="hg" bindchange="onHierChildChange" data-field="{{hierField}}" data-parent="{{sheetParent}}">
+          <label wx:for="{{sheetChildrenShown}}" wx:key="label" class="hg-row">
+            <checkbox value="{{item.label}}" checked="{{item.sel}}" color="#FF8C42"/>
+            <text class="hg-label">{{item.label}}</text>
+            <text wx:if="{{item.alias}}" class="hg-alias">（{{item.alias}}）</text>
+          </label>
+        </checkbox-group>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 社区贡献食材：分类弹窗（点第 7 步分类 chip 打开，含搜索） -->
+  <view wx:if="{{showCommunitySheet}}" class="sheet-mask" catchtap="closeCommunitySheet" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <view class="search-bar">
+          <text class="search-ico">🔍</text>
+          <input class="search-input" value="{{communityKeyword}}" bindinput="onCommunitySearch" confirm-type="search"/>
+          <view wx:if="{{communityKeyword}}" class="search-clear" catchtap="onCommunitySearchClear">✕</view>
+        </view>
+        <view class="sheet-done" bindtap="closeCommunitySheet">完成</view>
+      </view>
+      <scroll-view scroll-y class="hg-scroll sheet-scroll">
+        <checkbox-group class="hg" bindchange="onCommunityChildChange">
+          <label wx:for="{{communitySheetChildrenShown}}" wx:key="label" class="hg-row">
+            <checkbox value="{{item.label}}" checked="{{item.sel}}" color="#FF8C42"/>
+            <text class="hg-label">{{item.label}}</text>
+            <text wx:if="{{item.alias}}" class="hg-alias">（{{item.alias}}）</text>
+          </label>
+        </checkbox-group>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 社区贡献食材（第 7 步）：按分类展示，点分类弹窗多选，避免条目过多时界面过长 -->
+  <view wx:if="{{communityMode}}" class="grid">
+    <view wx:for="{{communityCats}}" wx:key="label"
+          class="chip {{item.sel ? 'sel' : ''}}"
+          bindtap="openCommunitySheet" data-label="{{item.label}}">
+      {{item.label}}
+      <view class="chev" catchtap="openCommunitySheet" data-label="{{item.label}}">▸</view>
+    </view>
+  </view>
+
+  <!-- 普通多选：主食 / 做法 / 就餐形式 / 忌口（社区贡献食材仅在第 7 步，排除） -->
+  <view wx:if="{{multiMode && !hierMode && step !== 7}}" class="grid">
+    <view wx:for="{{multiOptions}}" wx:key="label"
+          class="chip {{item.sel ? 'sel' : ''}} {{item.allergen ? 'allergen' : ''}}"
+          bindtap="toggleMulti"
+          data-label="{{item.label}}"
+          data-act="{{item.act}}"
+          data-val="{{item.val}}">{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{communityMode && communityIngList.length === 0}}" class="tip">暂时还没有人贡献食材</view>
+
+  <!-- 辣度（单选） -->
+  <block wx:if="{{step===2}}">
+    <view class="sub">选你平时的吃辣程度，可不选</view>
+    <view class="grid">
+      <view wx:for="{{spicyOptions}}" wx:key="label"
+            class="chip {{item.sel ? 'sel' : ''}}"
+            bindtap="selectSpicy" data-label="{{item.label}}">{{item.label}}</view>
+    </view>
+  </block>
+
+  <!-- 场景（多选） -->
+  <block wx:if="{{step===10}}">
+    <view class="sub">不同场景会分别推荐</view>
+    <view class="grid">
+      <view wx:for="{{sceneList}}" wx:key="label"
+            class="chip {{item.sel ? 'sel' : ''}}"
+            bindtap="toggleScene" data-label="{{item.label}}">{{item.label}}</view>
+    </view>
+    <view wx:if="{{sceneHint}}" class="scene-hint">{{sceneHint}}</view>
+  </block>
+
+  <!-- 已选提示 -->
+  <view class="selected" wx:if="{{multiMode || communityMode}}">已选 {{selCount}} 项{{selCount ? '：' + selText : '（可不选，直接下一步）'}}</view>
+  <view class="selected" wx:if="{{step===2}}">已选辣度：{{selText}}</view>
+
+  <!-- 隐私未授权提示：拒绝后不退出，停留引导重新授权 -->
+  <view wx:if="{{!privacyAuthorized}}" class="privacy-tip">
+    <view class="privacy-text">保存偏好前需先同意《隐私协议》</view>
+    <view class="privacy-btn" bindtap="reAuthorize">阅读并同意</view>
+  </view>
+
+  <!-- 操作 -->
+  <view class="actions">
+    <button wx:if="{{!isFirstStep}}" class="btn-ghost half" bindtap="prev">上一步</button>
+    <button class="btn-primary {{!isFirstStep ? 'half' : ''}}" bindtap="next">
+      {{singleStep ? '保存' : (isLastStep ? '完成设置' : '下一步')}}
+    </button>
+  </view>
+
+  <view wx:if="{{step===11 && drinkWarn}}" class="drink-warn">⚠️ {{drinkWarn}}</view>
+
+
+  <view class="tip">{{stepTip}}</view>
+
+  <!-- 过敏原冲突弹窗 -->
+  <view wx:if="{{allergenDialog}}" class="conflict-mask" catchtap="closeAllergenDialog" catchtouchmove="noop">
+    <view class="conflict-box" catchtap="noop">
+      <view class="conflict-title">过敏原冲突</view>
+      <view class="conflict-desc">以下食材与过敏原冲突，请返回修改后重试：</view>
+      <view class="conflict-list">
+        <text wx:for="{{allergenDialogList}}" wx:key="*this" class="conflict-item">· {{item}}</text>
+      </view>
+      <view class="conflict-actions">
+        <view class="conflict-btn primary" bindtap="closeAllergenDialog">知道了，去修改</view>
+      </view>
+    </view>
+  </view>
+
+  </view>
+</view>

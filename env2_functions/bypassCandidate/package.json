@@ -1,0 +1,9 @@
+{
+  "name": "bypassCandidate",
+  "version": "1.0.0",
+  "description": "env2 候菜 per-user 预计算缓存（异步补充，不碰 env1 主链路）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

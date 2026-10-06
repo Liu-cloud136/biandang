@@ -1,0 +1,10 @@
+{
+  "name": "probeText",
+  "version": "1.0.0",
+  "description": "env2 hy3 文本生成并发上限探针",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

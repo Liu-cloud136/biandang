@@ -1,0 +1,10 @@
+{
+  "name": "fixReasonInEnv2",
+  "version": "1.0.0",
+  "description": "env2 侧用 AI 补全 env1 菜品 reason 并写回",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

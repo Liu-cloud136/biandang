@@ -1,0 +1,10 @@
+{
+  "name": "aiProbe",
+  "version": "1.0.0",
+  "description": "env2 cloud.ai() 阶段0 探针：hy3 文本 + 生图各跑1次，确认扣 env2 免费额度（方案 §7 阶段0）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

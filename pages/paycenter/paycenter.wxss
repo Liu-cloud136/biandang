@@ -1,0 +1,71 @@
+.page { padding: 32rpx 28rpx 60rpx; min-height: 100vh; box-sizing: border-box; background: #FDF8F4; }
+
+/* 余额卡 */
+.balance-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #FF8C42, #E8533E);
+  border-radius: 28rpx;
+  padding: 32rpx 36rpx;
+  color: #fff;
+  box-shadow: 0 10rpx 30rpx rgba(232, 83, 62, 0.25);
+  margin-bottom: 34rpx;
+}
+.bc-label { font-size: 26rpx; opacity: .92; }
+.bc-num { margin-top: 14rpx; display: flex; align-items: baseline; }
+.bc-num-big { font-size: 76rpx; font-weight: 800; line-height: 1; }
+.bc-unit { font-size: 26rpx; margin-left: 8rpx; opacity: .9; }
+.bc-sub {
+  font-size: 22rpx;
+  opacity: .95;
+  text-align: center;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, .2);
+  border: 1rpx solid rgba(255, 255, 255, .35);
+  border-radius: 999rpx;
+  padding: 10rpx 24rpx;
+  flex-shrink: 0;
+  max-width: 180rpx;
+}
+
+.sec-title { font-size: 30rpx; font-weight: 700; color: #333; margin-bottom: 20rpx; }
+
+/* 套餐卡 */
+.goods { display: flex; flex-direction: column; gap: 20rpx; }
+.pkg {
+  background: #fff;
+  border-radius: 22rpx;
+  padding: 26rpx 24rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.04);
+}
+.pkg-left { flex: 1; min-width: 0; }
+.pkg-name { font-size: 30rpx; font-weight: 700; color: #333; }
+.pkg-right { text-align: right; flex-shrink: 0; margin-left: 20rpx; }
+.pkg-price-row { display: flex; align-items: baseline; justify-content: flex-end; }
+.pkg-price { color: #E8533E; font-size: 48rpx; font-weight: 800; line-height: 1; }
+.pkg-price .cur { font-size: 28rpx; font-weight: 600; margin-right: 2rpx; }
+.pkg-orig { font-size: 24rpx; color: #bbb; text-decoration: line-through; margin-left: 10rpx; }
+.pkg-buy {
+  margin-top: 14rpx; display: inline-block; min-width: 140rpx;
+  text-align: center; padding: 12rpx 0; border-radius: 999rpx;
+  font-size: 26rpx; font-weight: 700;
+  background: linear-gradient(135deg,#FF8C42,#E8533E); color: #fff;
+}
+.pkg-buy:active { opacity: .8; }
+.pkg-buy.buying { opacity: .6; }
+
+.empty { text-align: center; color: #999; font-size: 28rpx; padding: 60rpx 0; }
+.empty .emoji { font-size: 60rpx; margin-bottom: 16rpx; }
+
+/* 底部说明 */
+.foot-note {
+  margin-top: 36rpx;
+  background: #fff7f0;
+  border: 1rpx solid #ffe3cd;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+}
+.fn-row { font-size: 22rpx; color: #b08a66; line-height: 1.8; }

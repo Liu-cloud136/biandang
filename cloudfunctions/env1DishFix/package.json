@@ -1,0 +1,10 @@
+{
+  "name": "env1DishFix",
+  "version": "1.0.0",
+  "description": "env1 侧点状小修救援：hy3 最小补丁直修食材/步骤/贴士/点评，结构性交 env2 一致性引擎",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

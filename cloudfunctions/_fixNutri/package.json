@@ -1,0 +1,9 @@
+{
+  "name": "_fixNutri",
+  "version": "1.0.0",
+  "description": "一次性回填 recommend_history 空壳 staples/drinks/dishes 营养字段",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

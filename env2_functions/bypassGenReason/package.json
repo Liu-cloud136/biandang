@@ -1,0 +1,10 @@
+{
+  "name": "bypassGenReason",
+  "version": "1.0.0",
+  "description": "env2 轻量 AI 补齐（cookbook 批量）：hy3 生成 → 写本地 dish_mirror",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "@cloudbase/node-sdk": "~3.16.0"
+  }
+}

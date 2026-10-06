@@ -1,0 +1,56 @@
+.page { padding: 32rpx 32rpx calc(200rpx + env(safe-area-inset-bottom)); }
+
+/* 上部功能区 */
+.func { background: #fff; border-radius: 24rpx; padding: 28rpx 28rpx 24rpx; box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.04); }
+.tabs { display: flex; gap: 16rpx; margin-bottom: 24rpx; }
+.tab { flex: 1; text-align: center; font-size: 28rpx; font-weight: 700; color: #B08968; background: #F3EBE3; padding: 16rpx 0; border-radius: 30rpx; }
+.tab.on { color: #fff; background: #FF8C42; }
+.f-input { width: 100%; min-height: 120rpx; background: #FAF6F1; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; box-sizing: border-box; }
+.f-tip { color: #C0795B; font-size: 25rpx; margin-top: 14rpx; }
+.f-result { margin-top: 18rpx; }
+.f-item { display: flex; align-items: center; padding: 18rpx 0; border-bottom: 1rpx solid #F1E9E1; }
+.f-check { width: 36rpx; height: 36rpx; border: 2rpx solid #D8C9B8; border-radius: 50%; margin-right: 18rpx; flex-shrink: 0; box-sizing: border-box; position: relative; }
+.f-check.on { border-color: #FF8C42; background: #FF8C42; }
+.f-check.on::after { content: ''; position: absolute; left: 12rpx; top: 6rpx; width: 9rpx; height: 17rpx; border: solid #fff; border-width: 0 3rpx 3rpx 0; transform: rotate(45deg); }
+.f-name { font-size: 30rpx; font-weight: 700; color: #333; }
+.f-item.sel .f-name { color: #FF8C42; }
+.f-save { margin-top: 24rpx; text-align: center; font-size: 28rpx; font-weight: 700; color: #FF8C42; background: #FDEEE2; padding: 20rpx 0; border-radius: 30rpx; }
+.f-actions { display: flex; gap: 16rpx; margin-top: 24rpx; }
+.f-btn { flex: 1; text-align: center; font-size: 28rpx; font-weight: 700; padding: 20rpx 0; border-radius: 30rpx; }
+.f-btn.confirm { color: #fff; background: #FF8C42; }
+.f-btn.ghost { color: #FF8C42; background: #FDEEE2; }
+.f-btn.loading { opacity: 0.7; }
+
+/* 生成中：自绘加载弹窗（与主页尝鲜加载风格一致） */
+.gen-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.gen-box { width: 440rpx; background: #fff; border-radius: 24rpx; padding: 56rpx 44rpx; box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.18); display: flex; flex-direction: column; align-items: center; }
+.gen-spin { width: 56rpx; height: 56rpx; border: 5rpx solid #ffe2cc; border-top-color: #FF8C42; border-radius: 50%; animation: gen-rotate 0.8s linear infinite; margin-bottom: 28rpx; }
+@keyframes gen-rotate { to { transform: rotate(360deg); } }
+.gen-title { font-size: 30rpx; font-weight: 700; color: #333; }
+/* 生成中：不确定态流光进度条（后端一次性返回，无真实阶段计数，用流动光带传递"进行中"活动感） */
+.gen-bar { position: relative; width: 100%; height: 12rpx; margin: 28rpx 0 14rpx; background: #f0f0f3; border-radius: 8rpx; overflow: hidden; }
+.gen-bar-fill { position: absolute; top: 0; left: 0; width: 45%; height: 100%; border-radius: 8rpx; background: linear-gradient(90deg, transparent, #FFB347, #FF8C42, transparent); animation: gen-indet 1.3s ease-in-out infinite; }
+@keyframes gen-indet { 0% { left: -45%; } 100% { left: 100%; } }
+.gen-tip { font-size: 23rpx; color: #999; text-align: center; }
+
+/* 下部记录区 */
+.rec-head { display: flex; align-items: baseline; justify-content: space-between; font-size: 30rpx; font-weight: 800; color: #333; margin: 40rpx 8rpx 20rpx; }
+.rec-hint { font-size: 22rpx; font-weight: 400; color: #b0a89e; }
+.rec-empty { display: flex; justify-content: center; align-items: center; color: #B9A89A; font-size: 26rpx; text-align: center; padding: 80rpx 0; }
+.rec-card { background: #fff; border-radius: 20rpx; padding: 28rpx 24rpx; margin-bottom: 20rpx; box-shadow: 0 4rpx 14rpx rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; }
+.rec-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.rec-tag { font-size: 20rpx; padding: 4rpx 16rpx; border-radius: 999rpx; line-height: 1.4; background: transparent; border: 1rpx solid currentColor; }
+.rec-tag--fridge { color: #FF8A3D; }
+.rec-tag--leftover { color: #8B6F4E; }
+.rec-time { font-size: 26rpx; color: #555; }
+
+/* 消耗次数二次确认（复用 claim 体系） */
+.claim-mask { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.claim-box { width: 580rpx; background: #fff; border-radius: 28rpx; padding: 44rpx 36rpx 32rpx; }
+.claim-title { text-align: center; font-size: 32rpx; font-weight: 800; color: #333; }
+.cost-desc { text-align: center; font-size: 27rpx; color: #666; margin: 24rpx 0 36rpx; line-height: 1.6; }
+.cost-num { color: #FF8C42; font-weight: 800; }
+.claim-actions { display: flex; gap: 20rpx; }
+.claim-btn { flex: 1; text-align: center; font-size: 28rpx; font-weight: 700; padding: 18rpx 0; border-radius: 30rpx; }
+.claim-btn.cancel { color: #FF8C42; background: #FDEEE2; }
+.claim-btn.confirm { color: #fff; background: #FF8C42; }
