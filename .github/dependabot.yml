@@ -1,0 +1,39 @@
+version: 2
+
+updates:
+  # ── 云函数依赖 ─────────────────────────────────────────────────────────────
+  # 114 个云函数目录各自声明同一组依赖（wx-server-sdk / @cloudbase/node-sdk /
+  # nodemailer / ws），且会随函数部署到线上，所以「依赖漏洞」等于「生产漏洞」。
+  #
+  # directories 支持通配符（directory 单数形式不支持）；
+  # group-by: dependency-name 会把跨目录的同一个依赖合并成一个 PR，
+  # 否则 114 个目录会各开一个 PR。
+  #
+  # 已知限制：官方文档写明 group-by「仅对版本更新生效」，
+  # 因此安全更新仍可能按目录分别开 PR（好在只有 4 个依赖，且不常出 CVE）。
+  - package-ecosystem: npm
+    directories:
+      - "/cloudfunctions/*"
+      - "/env2_functions/*"
+      - "/env1_functions/*"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      cloud-function-deps:
+        patterns:
+          - "*"
+        group-by: dependency-name
+    commit-message:
+      prefix: "chore(deps)"
+
+  # ── GitHub Actions 自身 ───────────────────────────────────────────────────
+  # 让 .github/workflows/codeql.yml 里引用的 action（checkout / codeql-action）
+  # 自动跟进大版本 —— 例如 CodeQL Action v3 将于 2026 年 12 月弃用，届时靠它升 v4。
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(ci)"

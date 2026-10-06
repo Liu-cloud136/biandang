@@ -315,6 +315,10 @@
 - **内容安全**：AI 生成文本经微信内容安全接口校验。
 - **隐私**：客户端日志不采集用户输入与 OpenID；用户偏好仅用于推荐用途。
 
+**依赖与漏洞**：仓库启用了 Dependabot（见 [`.github/dependabot.yml`](.github/dependabot.yml)）
+与 CodeQL 静态分析（见 [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)）。
+如果你发现安全问题，请按 [`SECURITY.md`](SECURITY.md) 的渠道**私下**报告，不要开公开 issue。
+
 > 发布前请再次确认：`project.config.json` 的 AppID、各云函数的环境 ID
 > 与全部环境变量都已替换为你自己的值。
 

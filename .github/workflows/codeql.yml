@@ -1,0 +1,52 @@
+# CodeQL 静态分析：扫描常见漏洞模式（注入、XSS、路径穿越、不安全的反序列化等）。
+#
+# 边界说明：CodeQL 覆盖的是「通用代码模式」，**不覆盖业务逻辑越权**
+# （例如管理员白名单判断写错、内部调用密钥兜底成常量）。它是兜底，不能替代代码审查。
+# 公开仓库免费。
+#
+# 注意：本 workflow 属于「advanced setup」。如果之后在仓库 Security 页
+# 点过 Code scanning 的「Set up」（default setup），两者会冲突，请二选一。
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 每周一 03:00 UTC 全量扫描一次
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze JavaScript / TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      security-events: write   # 上传 SARIF 结果到 Security 页
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:javascript-typescript'
