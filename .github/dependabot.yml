@@ -1,16 +1,24 @@
 version: 2
 
 updates:
-  # ── 云函数依赖 ─────────────────────────────────────────────────────────────
-  # 114 个云函数目录各自声明同一组依赖（wx-server-sdk / @cloudbase/node-sdk /
-  # nodemailer / ws），且会随函数部署到线上，所以「依赖漏洞」等于「生产漏洞」。
+  # ── 云函数依赖：只保留安全更新 ──────────────────────────────────────────────
+  # 114 个云函数目录声明同一组依赖（wx-server-sdk / @cloudbase/node-sdk /
+  # nodemailer / ws），且随函数部署上线，所以「依赖漏洞」= 「生产漏洞」。
   #
-  # directories 支持通配符（directory 单数形式不支持）；
-  # group-by: dependency-name 会把跨目录的同一个依赖合并成一个 PR，
-  # 否则 114 个目录会各开一个 PR。
+  # 为什么关闭常规版本升级（open-pull-requests-limit: 0）：
+  #   本意是用 group-by: dependency-name 把跨目录的同一依赖合并成一个 PR，
+  #   但各目录的版本写法并不一致，触发了官方限制
+  #   ——「若不同目录对同一依赖的版本约束不兼容，Dependabot 会分别开 PR」：
+  #       wx-server-sdk      112 个目录：~2.6.3 ×104、latest ×8
+  #       @cloudbase/node-sdk 37 个目录：~3.16.0 ×33、^3.16.0 ×2、latest ×2
+  #   结果是按目录各开一个 PR（114 个目录 × 若干依赖），合并无意义。
   #
-  # 已知限制：官方文档写明 group-by「仅对版本更新生效」，
-  # 因此安全更新仍可能按目录分别开 PR（好在只有 4 个依赖，且不常出 CVE）。
+  # open-pull-requests-limit: 0 只关掉「常规版本升级 PR」；
+  # 官方文档明确：**安全更新不受该上限约束，也不计入该上限**，仍然会正常开 PR。
+  # directories 仍然必须保留 —— 安全更新就是按这里覆盖的目录来找 manifest 的。
+  #
+  # 若将来把各目录版本写法统一（例如全部 ~2.6.3），可以去掉 limit: 0 并加回
+  # groups + group-by: dependency-name，即可做到「一个依赖一个 PR 覆盖所有目录」。
   - package-ecosystem: npm
     directories:
       - "/cloudfunctions/*"
@@ -18,18 +26,15 @@ updates:
       - "/env1_functions/*"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 5
-    groups:
-      cloud-function-deps:
-        patterns:
-          - "*"
-        group-by: dependency-name
+    open-pull-requests-limit: 0
     commit-message:
       prefix: "chore(deps)"
 
   # ── GitHub Actions 自身 ───────────────────────────────────────────────────
-  # 让 .github/workflows/codeql.yml 里引用的 action（checkout / codeql-action）
-  # 自动跟进大版本 —— 例如 CodeQL Action v3 将于 2026 年 12 月弃用，届时靠它升 v4。
+  # 这一项**保留**版本升级：它一年也就一两个 PR，而且是唯一能让
+  # .github/workflows/codeql.yml 里的 action 自动跟进的机制
+  # （例如 CodeQL Action v3 于 2026-12 弃用，需要靠它升到 v4）。
+  # 如果你也想关掉，把下面的 limit 改成 0 即可。
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
