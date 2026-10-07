@@ -4,7 +4,7 @@
   "description": "env2 菜名规范化：扫 dish_mirror 可疑怪名 → hy3 规范化 → 写 env1 审核池 dish_lexicon_pending（source=env2-lexicon）+ 本地副本",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

@@ -4,6 +4,6 @@
   "description": "Web 版（智能体涌现奖）对外聚合入口：游客身份 + 白名单分发到只读/游客态能力",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

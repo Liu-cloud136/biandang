@@ -4,7 +4,7 @@
   "description": "生成单个菜品的所需食材与烹饪步骤，消耗1次免费次数",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0",
     "ws": "^8.18.0"
   }

@@ -4,6 +4,6 @@
   "description": "虚拟支付次数包下单：生成 outTradeNo + 双签名 payData",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

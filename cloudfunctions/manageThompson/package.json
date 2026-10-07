@@ -4,6 +4,6 @@
   "description": "B② Thompson采样 开关与进度（管理员后台）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

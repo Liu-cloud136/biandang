@@ -4,7 +4,7 @@
   "description": "env2 AI 生成食材列表：hy3 生成 dish_mirror 缺 ingredients 的菜的结构化食材列表 → 写本地 dish_mirror.ingredients",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

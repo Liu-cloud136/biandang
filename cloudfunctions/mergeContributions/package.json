@@ -4,6 +4,6 @@
   "description": "贡献合并：达阈值(菜名≥50/食材≥25)后并入库并按数字用户ID发放次数",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

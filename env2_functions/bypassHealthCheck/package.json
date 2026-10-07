@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "description": "env2 旁路健康巡检：定时全链路探针，通道失效告警",
   "main": "index.js",
-  "dependencies": { "wx-server-sdk": "~2.6.3" }
+  "dependencies": { "wx-server-sdk": "~4.0.2" }
 }

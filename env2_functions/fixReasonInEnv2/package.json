@@ -4,7 +4,7 @@
   "description": "env2 侧用 AI 补全 env1 菜品 reason 并写回",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

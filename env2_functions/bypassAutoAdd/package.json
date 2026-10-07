@@ -4,6 +4,6 @@
   "description": "env2 补菜链自动化消费端（候选池 → mirror 全维 → ready）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

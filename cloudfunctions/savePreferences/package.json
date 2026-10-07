@@ -4,6 +4,6 @@
   "description": "保存用户饮食偏好",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

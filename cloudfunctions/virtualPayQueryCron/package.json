@@ -4,6 +4,6 @@
   "description": "虚拟支付查单兜底定时器：对 2 分钟未发货订单调 query_order 补发",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

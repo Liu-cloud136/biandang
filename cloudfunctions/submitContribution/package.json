@@ -4,7 +4,7 @@
   "description": "贡献菜名/食材：库去重+AI审核(非编造/非重复)后记录，达阈值自动触发合并发放次数",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "^3.16.0",
     "ws": "^8.18.0"
   }

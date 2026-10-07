@@ -4,7 +4,7 @@
   "description": "env2 AI 发明新菜：hy3 生成候选菜名 → 去重 → 完整流水线（画像/营养/做法/生图）→ 写 dish_mirror + env1 审核池",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

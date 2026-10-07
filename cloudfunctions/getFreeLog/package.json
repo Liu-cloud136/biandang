@@ -4,6 +4,6 @@
   "description": "获取免费次数增减明细",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

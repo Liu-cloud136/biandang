@@ -4,7 +4,7 @@
   "description": "env2 补图：扫 env2 本地 dish_mirror 缺 imageUrl 的菜，混元生图 → 写 env2 本地 dish_mirror + 预留 env1 COS 回写点（A 模式接入后启用）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0"
   }
 }

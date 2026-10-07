@@ -4,6 +4,6 @@
   "description": "全局算法理解总览（基于 selected 统计，零扣次）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

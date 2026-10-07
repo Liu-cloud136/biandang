@@ -4,6 +4,6 @@
   "description": "虚拟支付次数商品列表（登录态）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

@@ -4,6 +4,6 @@
   "description": "一次性修复清洗数据导致的 imageUrl 失效（菜名.png -> dish_images 正确 md5 fileID）",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

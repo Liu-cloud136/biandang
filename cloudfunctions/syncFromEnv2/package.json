@@ -4,6 +4,6 @@
   "description": "env1 主动从 env2 拉新菜产物到审核池",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3"
+    "wx-server-sdk": "~4.0.2"
   }
 }

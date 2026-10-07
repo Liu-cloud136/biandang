@@ -4,7 +4,7 @@
   "description": "temp probe for reason compliance rate",
   "main": "index.js",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "@cloudbase/node-sdk": "~3.16.0",
     "ws": "^8.18.0"
   }

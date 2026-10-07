@@ -2,7 +2,7 @@
   "name": "autoBackup",
   "version": "1.0.0",
   "dependencies": {
-    "wx-server-sdk": "~2.6.3",
+    "wx-server-sdk": "~4.0.2",
     "ws": "^8.18.0"
   }
 }

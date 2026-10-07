@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "description": "env2 相似菜去重：hy3 判断同义/近似菜，标记重复不进正式库",
   "main": "index.js",
-  "dependencies": { "wx-server-sdk": "~2.6.3", "@cloudbase/node-sdk": "~3.16.0" }
+  "dependencies": { "wx-server-sdk": "~4.0.2", "@cloudbase/node-sdk": "~3.16.0" }
 }
